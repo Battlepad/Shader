@@ -33,7 +33,7 @@ float distance(vec3 point)
 {
 	vec3 spherePos = vec3(0.0,0.0,0.0);
 	float radius = 0.800;
-	vec3 b = vec3(6.0,6.0,10.0);
+	vec3 b = vec3(6.0,6.0,0.0);
 	point = repeat(point, b);
 	return distSphere(point, spherePos, radius);
 }
@@ -75,7 +75,7 @@ void main()
 			vec3 reflection = normalize(reflect(camDir, normal));
 			//vec3 origin = newPos;
 			vec3 newPosReflect = newPos + normal * 0.1;
-			for(int j=0; j <= 100; j++)
+			for(int j=0; j <= 10; j++)
 			{
 				float tReflect = distance(newPosReflect);
 				newPosReflect = newPosReflect + reflection*tReflect;
