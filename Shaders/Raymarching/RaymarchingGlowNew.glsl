@@ -6,7 +6,7 @@ varying vec2 uv;
 float time=iGlobalTime;
 
 const float epsilon = 0.001;
-const float glowEpsilon = 0.15;
+const float glowEpsilon = 0.18;
 const int maxIterations = 96;
 
 
@@ -80,14 +80,14 @@ void main()
 			vec4 color = sphereColor*max(0.2, dot(normal, normalize(lightPos-newPos)));
 			//gl_FragColor = color;
 
-
-			gl_FragColor = mix(color, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/200);
+			gl_FragColor = mix(color*(glowEpsilon-glowT)*6, vec4(0.8,0.5,1.0,1.0), length(newPos-camP)/200);
 			return;
 		}
 		//else gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0)+vec4(1.0,1.0,0.5,1.0), vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
 
 		//else if(glowT < glowEpsilon) gl_FragColor = vec4(0.0,0.0,0.0,0.0)+sphereColor*(glowEpsilon-glowT)*20;
-		else if (glowT < glowEpsilon) gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0)+sphereColor*(glowEpsilon-glowT)*20, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/200);
+		else if (glowT < glowEpsilon) gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0)+sphereColor*(glowEpsilon-glowT)*12, vec4(0.8,0.5,1.0,1.0), length(newPos-camP)/100);
+		//else gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0), vec4(1.0,0.5,0.5,1.0),length(newPos-camP)/200);
 
 		//else gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0), vec4(0.9,0.4,0.9,0.9), length(newPos-camP)/400);
 

@@ -10,3 +10,8 @@ C:\Users\Battlepad\Desktop\MMPROG-master\MMPROG-master\ShaderForm\obj\Release\Sh
 C:\Users\Battlepad\Desktop\MMPROG-master\MMPROG-master\ShaderForm\obj\Release\ShaderForm.csproj.GenerateResource.Cache
 C:\Users\Battlepad\Desktop\MMPROG-master\MMPROG-master\ShaderForm\obj\Release\ShaderForm.exe
 C:\Users\Battlepad\Desktop\MMPROG-master\MMPROG-master\ShaderForm\obj\Release\ShaderForm.pdb
+C:\MMPROG\ShaderForm_x64\bin\Release\ShaderForm.exe.config
+C:\MMPROG\ShaderForm_x64\obj\Release\ShaderForm.csprojResolveAssemblyReference.cache
+C:\MMPROG\ShaderForm_x64\obj\Release\ShaderForm.FormMain.resources
+C:\MMPROG\ShaderForm_x64\obj\Release\ShaderForm.Properties.Resources.resources
+C:\MMPROG\ShaderForm_x64\obj\Release\ShaderForm.csproj.GenerateResource.Cache
