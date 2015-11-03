@@ -32,8 +32,8 @@ float distSphere(vec3 origin, vec3 middle, float r)
 float distance(vec3 point)
 {
 	vec3 spherePos = vec3(0.0,0.0,0.0);
-	float radius = 0.100;
-	vec3 b = vec3(1.0,0.5,0.0);
+	float radius = 0.400;
+	vec3 b = vec3(2.0,4.0,4.0);
 	point = repeat(point, b);
 	return distSphere(point, spherePos, radius);
 }
@@ -73,19 +73,20 @@ void main()
 		t = newT;
 
 		newPos = newPos + camDir*t;
-		if(newT <= epsilon) 
+		if(t <= epsilon) 
 		{
 			vec3 normal = normalize(getNormal(newPos));
 			//vec3 color = mix(vec3(0.5,1.0,1.0), vec3(1.0,0.5,1.0), length(camP+t*camDir)/10);
 			//gl_FragColor = vec4(color,1.0);
 			vec4 color = sphereColor*max(0.2, dot(normal, normalize(lightPos-newPos)));
 			
-			gl_FragColor = mix(color, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
+			//gl_FragColor = mix(color, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
+			gl_FragColor = color;
 			return;
 		}
 		//else gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0)+vec4(1.0,1.0,0.5,1.0), vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
 
-		else if(glowT < glowEpsilon) gl_FragColor = vec4(0.0,0.0,0.0,0.0)+sphereColor*(glowEpsilon-glowT)*5;
+		//else if(glowT < glowEpsilon) gl_FragColor = vec4(0.0,0.0,0.0,0.0)+sphereColor*(glowEpsilon-glowT)*5;
 		else gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0), vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
 
 	}		

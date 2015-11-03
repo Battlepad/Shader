@@ -7,6 +7,7 @@ float time=iGlobalTime;
 
 const float epsilon = 0.001;
 const int maxIterations = 96;
+const float glowEpsilon = 0.1;
 
 
 
@@ -56,7 +57,9 @@ void main()
 
 	vec3 lightPos = vec3(1.0, 0.0, 0.0);
 
+	float newT = 10000.0;
 	float t = 10000.0;
+	float glowT = 10000.0;
 
 
 	vec4 sphereColor = vec4(0.5,1.0,1.0,1.0);
@@ -65,7 +68,9 @@ void main()
 
 	for(int i = 0; i <= maxIterations; i++)
 	{
-		t = distance(newPos);
+		newT = distance(newPos);
+		if(newT < t) glowT = newT;
+		t = newT;
 
 		newPos = newPos + camDir*t;
 		if(t <= epsilon) 
@@ -74,12 +79,12 @@ void main()
 			//vec3 color = mix(vec3(0.5,1.0,1.0), vec3(1.0,0.5,1.0), length(camP+t*camDir)/10);
 			//gl_FragColor = vec4(color,1.0);
 			vec4 color = sphereColor*max(0.2, dot(normal, normalize(lightPos-newPos)));
-			
-			gl_FragColor = mix(color, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
+			gl_FragColor = color;
+			//gl_FragColor = mix(color, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
 			return;
 		}
 		else
-			gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0), vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
+			gl_FragColor = mix(sphereColor*(glowEpsilon-glowT)*10, vec4(1.0,0.5,1.0,1.0), length(newPos-camP)/100);
 
 	}		
 	
