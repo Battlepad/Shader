@@ -6,7 +6,7 @@ varying vec2 uv;
 float time=iGlobalTime;
 
 const float epsilon = 0.001;
-const int maxIterations = 128;
+const int maxIterations = 256;
 
 // vec3 applyFog( in vec3  rgb,       // original color of the pixel
 //                in float distance ) // camera to point distance
@@ -41,6 +41,12 @@ vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
 	return mod(P,b)-b/2;
 }
 
+float distPlane( vec3 p, vec4 n )
+{
+  // n must be normalized
+  return dot(p,n.xyz) + n.w;
+}
+
 float distSphere(vec3 p, vec3 m, float r){
 	return length(p - m) - r;
 }
@@ -49,9 +55,21 @@ float distance(vec3 point){
 	vec3 spherePos = vec3(0.0,0.0,0.0);
 	float radius = 0.500;
 	vec3 b = vec3(4.0,3.0,3.0);
-	float dist = distSphere(repeat(point, b), spherePos, radius);
+	float dist = distSphere(point, spherePos, radius);
 	return dist;
 
+}
+
+float distScene(vec3 point)
+{
+	float distance;
+	float distanceSphere = distSphere(point, vec3(0.0, sin(iGlobalTime)+1,0.0), 0.500);
+	//float distanceSphere2 = distSphere(point, vec3(2.0, cos(iGlobalTime)+1,0.0), 0.500);
+	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
+	//distance = min(distanceSphere, distanceSphere2);
+	//distance = min(distance, distancePlane);
+	//return distance;
+	return min(distanceSphere, distancePlane);
 }
 
 vec3 getNormal(vec3 point)
@@ -66,9 +84,9 @@ vec3 getNormal(vec3 point)
 	vec3 before = point + vec3(0.0, 0.0, -d);
 
 	//gradient
-	vec3 gradient = vec3(distance(right) - distance(left),
-						distance(up) - distance(down),
-						distance(behind) - distance(before));
+	vec3 gradient = vec3(distScene(right) - distScene(left),
+						distScene(up) - distScene(down),
+						distScene(behind) - distScene(before));
 	return normalize(gradient);
 }
 
@@ -77,18 +95,20 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	Intersection intersect;
 	intersect.exists = false;
 
-	vec3 areaLightPos = vec3(1.0, 0.0, 0.0);
 	vec3 dirLightPos = vec3(0.0,1.0,0.0);
 	vec3 lightDirection = vec3(0.5,0.0,0.5);
-	vec4 sphereColor = vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 sphereColor = vec4(1.0, 0.2, 0.0, 1.0);
 	
-	float t = 10000.0;
+	float tSphere = 10000.0;
+	float tPlane = 10000.0;
 
 	vec3 newPos = origin;
 
 	for(int i = 0; i <= maxIterations; i++)
 	{
-		t = distance(newPos);
+		float t = distScene(newPos);
+		//tSphere = distance(newPos);
+		//tPlane = sdPlane(newPos, vec4(0.0,1.0,0.0,1.0));
 		newPos += direction*t;
 
 		if(t < epsilon) 
@@ -96,7 +116,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
 
-			vec4 color = sphereColor*max(0.2, dot(intersect.normal, normalize(areaLightPos-newPos)));
+			vec4 color = sphereColor;
 			intersect.color = color;
 			
 			intersect.intersectP = newPos;
@@ -104,6 +124,9 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			return intersect;
 		}
 	}
+
+
+
 	intersect.intersectP = newPos;
 	intersect.color = vec4(0.0,0.0,0.0,0.0);
 	return intersect;
@@ -115,16 +138,23 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec3(sin(iGlobalTime), 0.0, -20.0);
+	vec3 camP = vec3(0.0, 0.0, -5.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
 
-	vec4 fogColor = vec4(1.0,0.5,1.0,1.0);
+	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
+
+
+	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
 	float fog = 100.0;
 
 	Intersection intersect = rayMarch(camP, camDir);
+	//Lambert Light
+	intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 	if(intersect.exists)
 	{
 		Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+		//Lambert Light
+		reflIntersect.color = reflIntersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 		gl_FragColor = mix(intersect.color+reflIntersect.color, fogColor, length(intersect.intersectP-camP)/fog);
 	}		
 	else
