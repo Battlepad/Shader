@@ -25,6 +25,19 @@ struct Intersection
 	bool exists;
 };
 
+mat4 rotationMatrix(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
 float sphSoftShadow( in vec3 ro, in vec3 rd, in vec4 sph, in float k )
 {
     vec3 oc = ro - sph.xyz;
@@ -66,16 +79,16 @@ float distSphere(vec3 p, vec3 m, float r){
 	return length(p - m) - r;
 }
 
-float distTorus( vec3 p, vec2 t )
+float distTorus( vec3 p, vec3 m, vec2 t )
 {
-  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  vec2 q = vec2(length(p.xz-m.xz)-t.x,p.y-m.y);
   return length(q)-t.y;
 }
 
-float opTx( vec3 p, mat4 m )
+vec3 opTx( vec3 p, mat4 m )
 {
     vec3 q = inverse(m)*vec4(p,1.0);
-    return distTorus(q, vec2(0.20,0.05));
+    return q;
 }
 
 float distance(vec3 point){
@@ -84,7 +97,6 @@ float distance(vec3 point){
 	vec3 b = vec3(4.0,3.0,3.0);
 	float dist = distSphere(point, spherePos, radius);
 	return dist;
-
 }
 
 float opTwist( vec3 p )
@@ -101,11 +113,21 @@ float distScene(vec3 point)
 	float distance;
 	//float distanceSphere = distSphere(point, vec3(0.0, sin(iGlobalTime)+1,0.0), 0.500);
 	//float distanceSphere = opTwist(point);
-	//float distanceTorus = distTorus(point, vec2(0.20,0.05));
-	float distanceTorus = opTx(point, mat4(vec4(1.0,0.0,0.0,0.0),
-		vec4(0.0, cos(iGlobalTime), sin(iGlobalTime),0.0),
-		vec4(0.0, -sin(iGlobalTime), cos(iGlobalTime),0.0),
-		vec4(0.0)));
+	//float distanceTorus = distTorus(point, vec3(0.0, sin(iGlobalTime)/2,0.0), vec2(0.40,0.1));
+	// float distanceTorus = distTorus(opTx(point, mat4(
+ //                1, 0, 0, 0,
+ //                0, cos(iGlobalTime), -sin(iGlobalTime), 0,
+ //                0, sin(iGlobalTime), cos(iGlobalTime), 0,
+ //                0.0, 0.0, 0.0, 1 )),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
+
+	 float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
+
+
+					//*mat4(
+                //cos(iGlobalTime), 0, -sin(iGlobalTime), 0,
+                //0, 1, 0, 0,
+                //sin(iGlobalTime), 0, cos(iGlobalTime), 0,
+                //0.0, 0.0, 0.0, 1 )
 
 
 	//float distanceSphere2 = distSphere(point, vec3(2.0, cos(iGlobalTime)+1,0.0), 0.500);
@@ -198,12 +220,12 @@ void main()
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
 
 	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
-	vec3 dirLightPos = vec3(4.0,4.0,0.0);
+	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = normalize(vec3(-1.0,-1.0,0.0));
 
 
 	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
-	float fog = 100.0;
+	float fog = 75.0;
 
 	Intersection intersect = rayMarch(camP, camDir);
 
