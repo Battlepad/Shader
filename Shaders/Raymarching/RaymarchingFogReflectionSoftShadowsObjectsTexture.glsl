@@ -1,13 +1,20 @@
 uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
+uniform sampler2D tex;
 varying vec2 uv;
 
-float time=iGlobalTime;
+vec3 dirLightPos;
+vec3 planeColor;
 
 const float epsilon = 0.001;
 const int maxIterations = 256;
 const float shadowK = 24.0;
+
+const vec3 aPlane = vec3(-1.0,0.0,10.0);
+const vec3 bPlane = vec3(1.0,0.0,10.0);
+const vec3 cPlane = vec3(2.0,0.0,0.0);
+const vec3 dPlane = vec3(-1.0,0.0,0.0);
 
 // vec3 applyFog( in vec3  rgb,       // original color of the pixel
 //                in float distance ) // camera to point distance
@@ -75,6 +82,36 @@ float distPlane( vec3 p, vec4 n )
   return dot(p,n.xyz) + n.w;
 }
 
+float dot2( in vec3 v ) 
+{ 
+	return dot(v,v); 
+}
+
+float udQuad( vec3 p, vec3 a, vec3 b, vec3 c, vec3 d )
+{
+	planeColor = vec3(1.0,0.0,0.0);
+
+    vec3 ba = b - a; vec3 pa = p - a;
+    vec3 cb = c - b; vec3 pb = p - b;
+    vec3 dc = d - c; vec3 pc = p - c;
+    vec3 ad = a - d; vec3 pd = p - d;
+    vec3 nor = cross( ba, ad );
+
+    return sqrt(
+    (sign(dot(cross(ba,nor),pa)) +
+     sign(dot(cross(cb,nor),pb)) +
+     sign(dot(cross(dc,nor),pc)) +
+     sign(dot(cross(ad,nor),pd))<3.0)
+     ?
+     min( min( min(
+     dot2(ba*clamp(dot(ba,pa)/dot2(ba),0.0,1.0)-pa),
+     dot2(cb*clamp(dot(cb,pb)/dot2(cb),0.0,1.0)-pb) ),
+     dot2(dc*clamp(dot(dc,pc)/dot2(dc),0.0,1.0)-pc) ),
+     dot2(ad*clamp(dot(ad,pd)/dot2(ad),0.0,1.0)-pd) )
+     :
+     dot(nor,pa)*dot(nor,pa)/dot2(nor) );
+}
+
 float distSphere(vec3 p, vec3 m, float r){
 	return length(p - m) - r;
 }
@@ -120,7 +157,7 @@ float distScene(vec3 point)
  //                0, sin(iGlobalTime), cos(iGlobalTime), 0,
  //                0.0, 0.0, 0.0, 1 )),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
 
-	 float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
+	 //float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
 
 
 					//*mat4(
@@ -129,13 +166,13 @@ float distScene(vec3 point)
                 //sin(iGlobalTime), 0, cos(iGlobalTime), 0,
                 //0.0, 0.0, 0.0, 1 )
 
-
+	float distancePlane = udQuad(point, aPlane, bPlane, cPlane, dPlane);
 	//float distanceSphere2 = distSphere(point, vec3(2.0, cos(iGlobalTime)+1,0.0), 0.500);
-	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
+	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
 	//distance = min(distanceSphere, distanceSphere2);
 	//distance = min(distance, distancePlane);
 	//return distance;
-	return min(distanceTorus, distancePlane);
+	return distancePlane;
 }
 
 vec3 getNormal(vec3 point)
@@ -194,8 +231,8 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
 
-			vec4 color = sphereColor;
-			intersect.color = color;
+			vec4 color = vec4(planeColor,1.0);
+			intersect.color = texture(tex, vec2(newPos.x+1.0, newPos.z*0.25)*0.4);
 			
 			intersect.intersectP = newPos;
 
@@ -216,13 +253,12 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec3(0.0, 0.0, -5.0);
+	vec3 camP = vec3(0.0, 1.0, -5.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
 
 	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
-	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
+	dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = normalize(vec3(-1.0,-1.0,0.0));
-
 
 	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
 	float fog = 75.0;
@@ -235,15 +271,16 @@ void main()
 		float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
 		intersect.color = intersect.color*shadow;
 
-		Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
-		if(reflIntersect.exists)
-		{
-			float shadowReflect = max(0.2, softShadow(reflIntersect.intersectP, lightDir, 0.1, length(dirLightPos - reflIntersect.intersectP), shadowK));
-			reflIntersect.color = reflIntersect.color*shadowReflect;
-		}
+		//Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+		// if(reflIntersect.exists)
+		// {
+		// 	float shadowReflect = max(0.2, softShadow(reflIntersect.intersectP, lightDir, 0.1, length(dirLightPos - reflIntersect.intersectP), shadowK));
+		// 	reflIntersect.color = reflIntersect.color*shadowReflect;
+		// }
 
 		//Soft Shadows
-		gl_FragColor = mix(intersect.color+reflIntersect.color, fogColor, length(intersect.intersectP-camP)/fog);
+		//gl_FragColor = mix(intersect.color+reflIntersect.color, fogColor, length(intersect.intersectP-camP)/fog);
+		gl_FragColor = intersect.color;
 	}		
 	else
 		gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));

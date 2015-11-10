@@ -45,7 +45,7 @@ mat4 rotationMatrix(vec3 axis, float angle)
 vec3 background(vec3 dir, vec3 _lightPos)
 {
 	float sun = max(0.0, dot(dir, _lightPos));
-	return (sun*0.4* vec3(1.0, 1.0, 0.0));
+	return (sun*0.2* vec3(1.0, 1.0, 1.0));
 }
 
 float sphSoftShadow( in vec3 ro, in vec3 rd, in vec4 sph, in float k )
@@ -144,15 +144,18 @@ float distScene(vec3 point)
 	//float distanceSphere2 = distSphere(point, vec3(2.0, cos(iGlobalTime)+1,0.0), 0.500);
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
 
-
-	globalObjectColor = distanceTorus == min(distanceTorus, distanceSphere) ? torusColor : sphereColor;
+	float distanceTmp = min(distanceTorus, distanceSphere);
+	distanceTmp = min(distanceTorus, distanceSphere);
+	globalObjectColor = distanceTorus == distanceTmp ? torusColor : sphereColor;
+	distanceTmp = min(distancePlane, distanceTmp);
+	globalObjectColor = distancePlane == distanceTmp ? planeColor : globalObjectColor;
 
 
 	//distance = min(distanceSphere, distanceSphere2);
 	//distance = min(distance, distancePlane);
 	//return distance;
 	float distanceTmp = min(distanceTorus, distanceSphere);
-	return min(distancePlane, distanceTmp);
+	return globalObjectColor;
 }
 
 vec3 getNormal(vec3 point)
@@ -219,9 +222,6 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			return intersect;
 		}
 	}
-
-
-
 	intersect.intersectP = newPos;
 	intersect.color = vec4(0.0,0.0,0.0,0.0);
 	return intersect;
@@ -240,7 +240,7 @@ void main()
 	dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = normalize(vec3(-1.0,-1.0,0.0));
 
-	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
+	vec4 fogColor = vec4(0.0,0.7,0.7,1.0);
 	vec3 bgColor = background(camDir, dirLightPos);
 	float fog = 200.0;
 
@@ -263,6 +263,6 @@ void main()
 		gl_FragColor = mix(intersect.color+reflIntersect.color, fogColor, length(intersect.intersectP-camP)/fog);
 	}		
 	else
-		gl_FragColor = mix(vec4(bgColor,1.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
+		gl_FragColor = mix(vec4(bgColor,1.0),fogColor, 0.65);
 		//gl_FragColor = vec4(bgColor,1.0);
 }		

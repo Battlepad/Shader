@@ -2,16 +2,22 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 varying vec2 uv;
+uniform sampler2D tex;
 
 vec3 dirLightPos;
 vec4 globalObjectColor = vec4(0.0,0.0,0.0,1.0);
 vec4 torusColor = vec4(1.0, 0.2, 0.0, 1.0);
 vec4 sphereColor = vec4(1.0, 0.2, 0.0, 1.0);
 vec4 planeColor = vec4(0.5, 1.0, 0.0, 1.0);
+bool quadHit = false;
 
 const float epsilon = 0.001;
 const int maxIterations = 256;
 const float shadowK = 24.0;
+const vec3 aPlane = vec3(-12.0,-1.0,15.0);
+const vec3 bPlane = vec3(12.0,-1.0,15.0);
+const vec3 cPlane = vec3(10.0,-1.0,-3.0);
+const vec3 dPlane = vec3(-10.0,-1.0,-3.0);
 
 // vec3 applyFog( in vec3  rgb,       // original color of the pixel
 //                in float distance ) // camera to point distance
@@ -45,7 +51,7 @@ mat4 rotationMatrix(vec3 axis, float angle)
 vec3 background(vec3 dir, vec3 _lightPos)
 {
 	float sun = max(0.0, dot(dir, _lightPos));
-	return (sun*0.4* vec3(1.0, 1.0, 0.0));
+	return (sun*0.2* vec3(1.0, 1.0, 1.0));
 }
 
 float sphSoftShadow( in vec3 ro, in vec3 rd, in vec4 sph, in float k )
@@ -85,6 +91,33 @@ float distPlane( vec3 p, vec4 n )
   return dot(p,n.xyz) + n.w;
 }
 
+float dot2( in vec3 v ) 
+{ 
+	return dot(v,v); 
+}
+float udQuad( vec3 p, vec3 a, vec3 b, vec3 c, vec3 d )
+{
+    vec3 ba = b - a; vec3 pa = p - a;
+    vec3 cb = c - b; vec3 pb = p - b;
+    vec3 dc = d - c; vec3 pc = p - c;
+    vec3 ad = a - d; vec3 pd = p - d;
+    vec3 nor = cross( ba, ad );
+
+    return sqrt(
+    (sign(dot(cross(ba,nor),pa)) +
+     sign(dot(cross(cb,nor),pb)) +
+     sign(dot(cross(dc,nor),pc)) +
+     sign(dot(cross(ad,nor),pd))<3.0)
+     ?
+     min( min( min(
+     dot2(ba*clamp(dot(ba,pa)/dot2(ba),0.0,1.0)-pa),
+     dot2(cb*clamp(dot(cb,pb)/dot2(cb),0.0,1.0)-pb) ),
+     dot2(dc*clamp(dot(dc,pc)/dot2(dc),0.0,1.0)-pc) ),
+     dot2(ad*clamp(dot(ad,pd)/dot2(ad),0.0,1.0)-pd) )
+     :
+     dot(nor,pa)*dot(nor,pa)/dot2(nor) );
+}
+
 float distSphere(vec3 p, vec3 m, float r){
 	return length(p - m) - r;
 }
@@ -120,6 +153,8 @@ float opTwist( vec3 p )
 
 float distScene(vec3 point)
 {
+	point.y += sin(point.z - iGlobalTime * 6.0) * cos(point.x - iGlobalTime) * .25; //waves!
+
 	float distance;
 	//float distanceSphere = distSphere(point, vec3(0.0, sin(iGlobalTime)+1,0.0), 0.500);
 	//float distanceSphere = opTwist(point);
@@ -130,8 +165,8 @@ float distScene(vec3 point)
  //                0, sin(iGlobalTime), cos(iGlobalTime), 0,
  //                0.0, 0.0, 0.0, 1 )),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
 	
-	float distanceSphere = distSphere(point, vec3(0), 0.1);
-	float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
+	float distanceSphere = distSphere(point, vec3(0), 0.05);
+	float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0,0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
 
 
 					//*mat4(
@@ -142,17 +177,20 @@ float distScene(vec3 point)
 
 
 	//float distanceSphere2 = distSphere(point, vec3(2.0, cos(iGlobalTime)+1,0.0), 0.500);
-	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
+	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
+	float distanceQuad = udQuad(point, aPlane, bPlane, cPlane, dPlane);
 
-
-	globalObjectColor = distanceTorus == min(distanceTorus, distanceSphere) ? torusColor : sphereColor;
+	//globalObjectColor = distanceTorus == min(distanceTorus, distanceSphere) ? torusColor : sphereColor;
+	distanceTorus == min(distanceTorus, distanceSphere);
 
 
 	//distance = min(distanceSphere, distanceSphere2);
 	//distance = min(distance, distancePlane);
 	//return distance;
 	float distanceTmp = min(distanceTorus, distanceSphere);
-	return min(distancePlane, distanceTmp);
+	//distanceTmp = min(distancePlane, distanceTmp);
+	quadHit = distanceQuad == min(distanceQuad, distanceTmp) ? true : false;
+	return min(distanceQuad, distanceTmp);
 }
 
 vec3 getNormal(vec3 point)
@@ -211,17 +249,22 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
 
+			if(quadHit)
+			{
+				intersect.color = texture(tex, vec2(newPos.x+1., newPos.z*0.2)*0.2);
+
+			}
+			else
+			{
 			vec4 color = sphereColor;
 			intersect.color = color;
+		}
 			
 			intersect.intersectP = newPos;
 
 			return intersect;
 		}
 	}
-
-
-
 	intersect.intersectP = newPos;
 	intersect.color = vec4(0.0,0.0,0.0,0.0);
 	return intersect;
@@ -240,8 +283,9 @@ void main()
 	dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = normalize(vec3(-1.0,-1.0,0.0));
 
-	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
+	vec4 fogColor = vec4(0.0,0.7,0.7,1.0);
 	vec3 bgColor = background(camDir, dirLightPos);
+	vec3 planeColor = (1.0,0.0,0.0);
 	float fog = 200.0;
 
 	Intersection intersect = rayMarch(camP, camDir);
@@ -263,6 +307,6 @@ void main()
 		gl_FragColor = mix(intersect.color+reflIntersect.color, fogColor, length(intersect.intersectP-camP)/fog);
 	}		
 	else
-		gl_FragColor = mix(vec4(bgColor,1.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
+		gl_FragColor = mix(vec4(bgColor,1.0),fogColor, 0.65);
 		//gl_FragColor = vec4(bgColor,1.0);
 }		
