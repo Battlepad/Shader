@@ -91,7 +91,7 @@ vec3 opTx( vec3 p, mat4 m )
     return q;
 }
 
-float distSphere(vec3 point){
+float distance(vec3 point){
 	vec3 spherePos = vec3(0.0,0.0,0.0);
 	float radius = 0.500;
 	vec3 b = vec3(4.0,3.0,3.0);
@@ -119,9 +119,8 @@ float distScene(vec3 point)
  //                0, cos(iGlobalTime), -sin(iGlobalTime), 0,
  //                0, sin(iGlobalTime), cos(iGlobalTime), 0,
  //                0.0, 0.0, 0.0, 1 )),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
-	
-	float distanceSphere = distSphere(point, vec3(0), 0.1);
-	float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
+
+	 float distanceTorus = distTorus(opTx(point, rotationMatrix(vec3(1.0,1.0,0.0), iGlobalTime)),vec3(0.0, 0.0,0.0), vec2(0.40,0.2)); //point to rotate around       
 
 
 					//*mat4(
@@ -136,8 +135,7 @@ float distScene(vec3 point)
 	//distance = min(distanceSphere, distanceSphere2);
 	//distance = min(distance, distancePlane);
 	//return distance;
-	float distanceTmp = min(distanceTorus, distanceSphere);
-	return min(distancePlane, distanceTmp);
+	return min(distanceTorus, distancePlane);
 }
 
 vec3 getNormal(vec3 point)
@@ -224,6 +222,7 @@ void main()
 	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
 	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = normalize(vec3(-1.0,-1.0,0.0));
+
 
 	vec4 fogColor = vec4(0.0,0.8,0.8,1.0);
 	float fog = 75.0;

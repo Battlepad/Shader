@@ -1,14 +1,5 @@
-uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
-varying vec2 uv;
-
-float time=iGlobalTime;
-
-float distFunc(vec3 p)
-{
-    return length(mod(p+vec3(0,0,mod(-time*19.,4.)),4.)-2.)-.4;
-}
 
 float quad(float a)
 {
@@ -45,7 +36,7 @@ void main()
 		{
 			for(float z = 1.0; z <= 5.0; ++z)
 			{	
-				float newT = sphere(vec3(x*sin(iGlobalTime), y*sin(iGlobalTime), z), camP, camDir);
+				float newT = sphere(vec3(x, y, z), camP, camDir);
 				if (0.0 < newT && newT < t)
 				{	
 					t = newT;
