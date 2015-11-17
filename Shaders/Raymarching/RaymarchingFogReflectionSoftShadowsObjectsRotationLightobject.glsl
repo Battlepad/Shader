@@ -233,7 +233,7 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec3(0.0, 0.0, -10.0);
+	vec3 camP = vec3(0.0, 0.0, -5.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
 
 	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
