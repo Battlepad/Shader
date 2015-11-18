@@ -10,13 +10,13 @@ varying vec2 uv;
 vec3 dirLightPos;
 vec3 planeColor;
 
-const float epsilon = 0.001;
-const float marchEpsilon = 0.03;
-const int maxIterations = 2048;
+const float epsilon = 0.01;
+const float marchEpsilon = 0.01;
+const int maxIterations = 700;
 const int textureSize = 75;
 const vec4 fogColor = vec4(1.0, 0.2, 0.0, 1.0);
-const int fogK = 30;
-const float shadowK = 24.0;
+const int fogK = 13;
+const float shadowK = 30.0;
 
 const vec3 aPlane = vec3(-1.0,0.0,10.0);
 const vec3 bPlane = vec3(1.0,0.0,10.0);
@@ -100,12 +100,13 @@ float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
     return res;
 }
 
-Intersection rayMarch(vec3 origin, vec3 direction)
+Intersection rayMarch(vec3 origin, vec3 direction, float beginEpsilon)
 {
 	Intersection intersect;
 	intersect.exists = false;
 
 	vec3 newPos = origin;
+	newPos += beginEpsilon*direction; //set nearer pos, when terrain is far below the cam
 
 	for(int i = 0; i <= maxIterations; i++)
 	{
@@ -113,7 +114,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 
 		if(newPos.y <= height) 
 		{
-			newPos = bisect(newPos, direction, 10);
+			newPos = bisect(newPos, direction, 15);
 			height = f(newPos.x, newPos.z);
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
@@ -131,40 +132,52 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	return intersect;
 }
 
+float shadow(vec3 pos, vec3 lightDir)
+{
+	Intersection shadowIntersect = rayMarch(pos, -lightDir, 0.0);
+	return shadowIntersect.exists ? 0.2 : 1.0;
+
+}
+
 void main()
 {
 	float fov = 70.0;
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec3(50.0, 2.0, 20.0+iGlobalTime/2);//vec3(15.0, abs(sin(iGlobalTime))*5+5.0, 0.0);
+	vec3 camP = vec3(50.0, 1.5, 20.0+iGlobalTime/2);//vec3(15.0, abs(sin(iGlobalTime))*5+5.0, 0.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
-	camDir = (rotationMatrix(vec3(1.0,0.0,0.0), -20.0 * RAD) * vec4(camDir, 1.0)).xyz;
+	camDir = (rotationMatrix(vec3(1.0,0.0,0.0), -25.0 * RAD) * vec4(camDir, 1.0)).xyz;
 
 	vec3 areaLightPos = opTx(vec3(100.0,10.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-	vec3 dirLightPos = vec3(30.0, 5.0, 0.0);
+	//vec3 dirLightPos = opTx(vec3(100.0,10.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
+	vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
+
 
 	vec4 snowColor = vec4(0.0);
 
-	Intersection intersect = rayMarch(camP, camDir);
+	Intersection intersect = rayMarch(camP, camDir, 1.0);
 
 	if(intersect.exists)
 	{
 		vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
-		float shadow = max(0.2, softShadow(intersect.intersectP, dirLightPos, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		if(dot(intersect.normal, vec3(0.0,1.0,0.0)) >= 0.98)
+		//float shadow = max(0.2, softShadow(intersect.intersectP, dirLightPos, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
+		if(dot(intersect.normal, vec3(0.0,1.0,0.0)) >= 0.95)
 			snowColor = vec4(1.0);
-		intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)+snowColor; //snowColor is making problems
+		float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
+		intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect+snowColor;//*shadow + snowColor; //snowColor is making problems
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP))); //lighting
+		//shadows
+
 		intersect.color = mix(intersect.color, fogColor, min(length(intersect.intersectP-camP)/fogK,1.0)); //fog
-		Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+		Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)), 0.0);
 		if(reflIntersect.exists)
 		{
 			reflIntersect.color = reflIntersect.color*vec4(0.5, 1.0, 1.0, 1.0);
 			reflIntersect.color = reflIntersect.color*max(0.2, dot(reflIntersect.normal, normalize(areaLightPos-reflIntersect.intersectP))); //lighting
-			reflIntersect.color = mix(reflIntersect.color, fogColor, min(length(reflIntersect.intersectP-camP)/fogK,1.0)); //fog
+			//reflIntersect.color = mix(reflIntersect.color, fogColor, min(length(reflIntersect.intersectP-camP)/fogK,1.0)); //fog
 		}
-		gl_FragColor = intersect.color+reflIntersect.color;
+		gl_FragColor = mix(intersect.color+reflIntersect.color*0.5, fogColor, length(intersect.intersectP-camP)/fogK);
 	}		
 	else
 		gl_FragColor = fogColor;
