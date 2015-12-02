@@ -90,12 +90,10 @@ float CalcAngle(vec2 _uv)
 	{
 		for(int x=0; x<iResolution.x; x++)
 		{
-			vec3 A = vec3(_uv.xy*iResolution.xy, texture(tex, _uv).r);
-			vec3 B = vec3(vec2(x,y), texture(tex, vec2((x,y)/iResolution.xy)).r);
-			vec3 C = vec3(vec2(x,y), B.z - A.z);
-			float b_div_c = C.z / length(C-A);
+			float hypothenuse = length(vec2(x,y)/iResolution.xy - _uv.xy);
+			float height = (vec2(x,y)/iResolution.xy).r - texture(tex, _uv).r; 
+			float b_div_c = height / hypothenuse;
 			angleNew = asin(b_div_c);
- //angle && _uv.x*iResolution.x != x && _uv.y*iResolution.y != y
 			if(angleNew > angle)
 			{
 				angle = angleNew;
@@ -117,8 +115,8 @@ void main()
 	//Intersection intersect = rayMarch(camP, camDir, 1.0);
 	float angleFin = CalcAngle(uv);
 	vec3 color = texture(tex, uv).rgb;
-	int divisor = 90;
-	gl_FragColor = vec4(angleFin/divisor, angleFin/divisor, angleFin/divisor, 1.0);
+	int divisor = 180;
+	gl_FragColor = vec4(angleFin/divisor, texture(tex, uv).x, 1.0, 1.0);
 	//if(intersect.exists)
 	//{
 		//gl_FragColor = intersect.color;
