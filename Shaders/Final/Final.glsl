@@ -1,9 +1,11 @@
 uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
+uniform sampler2D tex;
 varying vec2 uv;
 
 float time=iGlobalTime;
+int textureSize = 100;
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.3,1.0,0.3,1.0);
 vec4 planeColor = vec4(0.3,0.3,1.0,1.0);
@@ -13,6 +15,14 @@ const float epsilon = 0.00001;
 const int maxIterations = 512;
 const float RAD = 0.0174533;
 
+
+
+const float marchEpsilon = 0.01;
+
+
+
+
+
 struct Intersection
 {
 	vec3 intersectP;
@@ -20,8 +30,6 @@ struct Intersection
 	vec3 normal;
 	bool exists;
 };
-
-
 
 mat4 rotationMatrix(vec3 axis, float angle)
 {
@@ -38,15 +46,15 @@ mat4 rotationMatrix(vec3 axis, float angle)
 
 mat4 translationMatrix(vec3 delta)
 {
-	return mat4(	1.0,	0.0,	0.0,	delta.x
-					0.0,	1.0,	0.0,	delta.y
-					0.0,	0.0,	1.0,	delta.z
+	return mat4(	1.0,	0.0,	0.0,	delta.x,
+					0.0,	1.0,	0.0,	delta.y,
+					0.0,	0.0,	1.0,	delta.z,
 					0.0,	0.0,	0.0,	1.0 	);
 }
 
-vec4 translate(vec4 point, mat4 translMatrix)
+vec3 translate(vec4 point, mat4 translMatrix)
 {
-	return vec4(point*translMatrix);
+	return (translMatrix*point).xyz;
 }
 
 vec3 opTx( vec3 p, mat4 m )
@@ -55,6 +63,10 @@ vec3 opTx( vec3 p, mat4 m )
     return q;
 }
 
+float f(float x, float y)
+{
+	return texture(tex, trunc(vec2(x,y))/(textureSize*0.1)).x*1.0;
+}
 
 float distPlane( vec3 p, vec4 n )
 {
@@ -62,9 +74,16 @@ float distPlane( vec3 p, vec4 n )
   return dot(p,n.xyz) + n.w;
 }
 
-float distBox( vec3 p, vec3 objPos, vec3 b )
+//float distBox( vec3 p, vec3 objPos, vec3 b )
+//{
+//  vec3 d = abs(p-objPos) - b;
+//  return min(max(d.x,max(d.y,d.z)),0.0) +
+         //length(max(d,0.0));
+//}
+
+float distBox( vec3 p, vec3 b )
 {
-  vec3 d = abs(p-objPos) - b;
+  vec3 d = abs(p) - b;
   return min(max(d.x,max(d.y,d.z)),0.0) +
          length(max(d,0.0));
 }
@@ -73,13 +92,29 @@ float distBox( vec3 p, vec3 objPos, vec3 b )
 float distScene(vec3 point)
 {
 	float distance;
-	float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
+	//float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
+	//float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
+	//float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)*translationMatrix(vec3(-4.0,0.0,0.0))
+	//	*rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime))*translationMatrix(vec3(1.0,1.0,0.0))).xyz, 
+	//						vec3(1.0,1.0,1.0)); 
+	float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
+		*translationMatrix(vec3(sin(iGlobalTime),-4.0,0.0)) //translation of cube
+		*rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)) //rotation around z-axis
+		*translationMatrix(vec3(1.0,-1.0,0.0))).xyz, //translation, so cube rotates around edge 
+		vec3(1.0,1.0,1.0)); 
+	float distanceFloor = f(point.x, point.z);
+	//float distanceBox = distBox(point - vec3(1.0, 0.0, 0.0), vec3(1.0,1.0,1.0)); 
+		// float distanceBox = distBox(translate(vec4(point.x,point.y,point.z,1.0), translationMatrix(vec3(0.0,0.0,0.0))), vec3(1.0,1.0,1.0)); 
+
 	
-	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
+	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
 
-	globalColor = min(distanceBox, distancePlane) == distanceBox ? boxColor : planeColor;
+	globalColor = min(distanceBox, distanceFloor) == distanceBox ? boxColor : planeColor;
 
-	return min(distanceBox, distancePlane);
+	return min(distanceBox, distanceFloor);
+	//globalColor = boxColor;
+	//	return distanceBox;
+
 }
 
 vec3 getNormal(vec3 point)
@@ -155,8 +190,9 @@ void main()
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
 	//vec3 camP = vec3(sin(iGlobalTime), sin(iGlobalTime), -10.0);
-	vec3 camP = vec3(0.0, 3.0, -10.0); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
-	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
+	vec3 camP = vec3(0.0, 3.0, 10.0); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
+	vec3 camDir = normalize(vec3(p.x, p.y, -1.0));
+	camDir = (rotationMatrix(vec3(1.0,0.0,0.0), -25.0 * RAD) * vec4(camDir, 1.0)).xyz;
 
 	vec3 areaLightPos = vec3(0.5, 3.0, -1.0);
 	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
