@@ -21,6 +21,8 @@ struct Intersection
 	bool exists;
 };
 
+
+
 mat4 rotationMatrix(vec3 axis, float angle)
 {
     axis = normalize(axis);
@@ -29,9 +31,22 @@ mat4 rotationMatrix(vec3 axis, float angle)
     float oc = 1.0 - c;
     
     return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
-                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  -0.5,
-                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           -0.5,
+            	oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
                 0.0,                                0.0,                                0.0,                                1.0);
+}
+
+mat4 translationMatrix(vec3 delta)
+{
+	return mat4(	1.0,	0.0,	0.0,	delta.x
+					0.0,	1.0,	0.0,	delta.y
+					0.0,	0.0,	1.0,	delta.z
+					0.0,	0.0,	0.0,	1.0 	);
+}
+
+vec4 translate(vec4 point, mat4 translMatrix)
+{
+	return vec4(point*translMatrix);
 }
 
 vec3 opTx( vec3 p, mat4 m )
@@ -58,7 +73,7 @@ float distBox( vec3 p, vec3 objPos, vec3 b )
 float distScene(vec3 point)
 {
 	float distance;
-	float distanceBox = distBox(opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0), vec3(1.0,1.0,1.0));
+	float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
 	
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
 
