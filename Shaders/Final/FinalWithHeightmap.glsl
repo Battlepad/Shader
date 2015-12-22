@@ -5,6 +5,11 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform sampler2D tex;
+uniform float tiltTime;
+uniform float tiltY;
+uniform float tiltZ;
+uniform float boxPosZ;
+
 varying vec2 uv;
 
 float time=iGlobalTime;
@@ -15,15 +20,8 @@ vec4 planeColor = vec4(0.3,0.3,1.0,1.0);
 float shadowK = 24.0;
 
 const float epsilon = 0.01;
-const int maxIterations = 700;
-
-
-
-const float marchEpsilon = 0.01;
-
-
-
-
+const int maxIterations = 2000;
+const float marchEpsilon = 0.001;
 
 struct Intersection
 {
@@ -67,7 +65,7 @@ vec3 opTx( vec3 p, mat4 m )
 
 float f(float x, float y)
 {
-	return texture(tex, trunc(vec2(x,y))/(textureSize*0.1)).x*1.0;
+	return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*3.0; //1.5 ist Wert, wie oft Würfel wiederholt werden
 }
 
 vec3 bisect(vec3 _pos, vec3 _direction, int counter)
@@ -86,20 +84,13 @@ vec3 bisect(vec3 _pos, vec3 _direction, int counter)
 	return pos;
 }
 
-float distPlane( vec3 p, vec4 n )
+float distPlane(vec3 p, vec4 n, vec3 pos)
 {
   // n must be normalized
-  return dot(p,n.xyz) + n.w;
+  return dot(p-pos,n.xyz) + n.w;
 }
 
-//float distBox( vec3 p, vec3 objPos, vec3 b )
-//{
-//  vec3 d = abs(p-objPos) - b;
-//  return min(max(d.x,max(d.y,d.z)),0.0) +
-         //length(max(d,0.0));
-//}
-
-float distBox( vec3 p, vec3 b )
+float distBox(vec3 p, vec3 b)
 {
   vec3 d = abs(p) - b;
   return min(max(d.x,max(d.y,d.z)),0.0) +
@@ -109,29 +100,14 @@ float distBox( vec3 p, vec3 b )
 
 float distScene(vec3 point)
 {
-	float distance;
-	//float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
-	//float distanceBox = distBox(opTx(point,rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)), vec3(1.0,1.0,0.0), vec3(1.0,1.0,1.0)); 
-	//float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)*translationMatrix(vec3(-4.0,0.0,0.0))
-	//	*rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime))*translationMatrix(vec3(1.0,1.0,0.0))).xyz, 
-	//						vec3(1.0,1.0,1.0)); 
 	float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
-		*translationMatrix(vec3(sin(iGlobalTime),-4.0,0.0)) //translation of cube
-		*rotationMatrix(vec3(0.0,0.0,1.0), iGlobalTime)) //rotation around z-axis
-		*translationMatrix(vec3(1.0,-1.0,0.0))).xyz, //translation, so cube rotates around edge 
-		vec3(1.0,1.0,1.0)); 
-	//float distanceBox = distBox(point - vec3(1.0, 0.0, 0.0), vec3(1.0,1.0,1.0)); 
-		// float distanceBox = distBox(translate(vec4(point.x,point.y,point.z,1.0), translationMatrix(vec3(0.0,0.0,0.0))), vec3(1.0,1.0,1.0)); 
-
-	
-	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0));
-
-	//globalColor = min(distanceBox, distanceFloor) == distanceBox ? boxColor : planeColor;
-
-	//return min(distanceBox, distanceFloor);
-	globalColor = boxColor;
-	return distanceBox;
-
+		*translationMatrix(vec3(-4.0,-2.0,boxPosZ)) //translation of cube
+		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/1.5*(PI/2))) //rotation around z-axis
+		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
+		vec3(0.5)); 
+	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
+	globalColor = planeColor;
+	return distancePlane;
 }
 
 vec3 getNormal(vec3 point)
@@ -150,6 +126,14 @@ vec3 getNormal(vec3 point)
 						distScene(up) - distScene(down),
 						distScene(behind) - distScene(before));
 	return normalize(gradient);
+}
+
+vec3 getNormalHf(vec3 p)
+{
+    vec3 n = vec3( f(p.x-epsilon,p.z) - f(p.x+epsilon,p.z),
+                         2.0*epsilon,
+                         f(p.x,p.z-epsilon) - f(p.x,p.z+epsilon) );
+    return normalize( n );
 }
 
 float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
@@ -174,31 +158,34 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	vec3 newPos = origin;
 	newPos += 1.0*direction;
 
+	float height = 0; //TODO; 0 = guter Init wert?
+	float t = 1000;
+
 	for(int i = 0; i <= maxIterations; i++)
 	{
-		//float t = distScene(newPos);
-		//newPos += direction*t;
+		t = distScene(newPos);
+		height = f(newPos.x, newPos.z);
 
-		float height = f(newPos.x, newPos.z);
-		//if(t < epsilon) 
-		//{
-		//	intersect.exists = true;
-		//	intersect.normal = getNormal(newPos);
+		if(t < epsilon)
+		{
+			intersect.exists = true;
+			intersect.normal = getNormal(newPos);
 
-		//	intersect.color = globalColor;
+			intersect.color = globalColor;
 			
-		//	intersect.intersectP = newPos;
+			intersect.intersectP = newPos;
 
-		//	return intersect;
-		//}
-		if(newPos.y <= height)
+			return intersect;
+		}
+		else if(newPos.y <= height)
 		{
 			newPos = bisect(newPos, direction, 15);
 			height = f(newPos.x, newPos.z);
 			intersect.exists = true;
-			intersect.normal = getNormal(newPos);
+			intersect.normal = getNormalHf(newPos);
 			
-			globalColor = boxColor;
+			globalColor = planeColor;
+			//intersect.color = vec4(height);
 			intersect.color = globalColor;
 
 			
@@ -224,16 +211,17 @@ float shadow(vec3 pos, vec3 lightDir)
 
 void main()
 {
-	float fov = 70.0;
+	float fov = 90.0;
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
 	//vec3 camP = vec3(sin(iGlobalTime), sin(iGlobalTime), -10.0);
-	vec3 camP = vec3(50.0, 3.0, 10.0+iGlobalTime); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
+	vec3 camP = vec3(5.0, 6.0, 3.0); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (rotationMatrix(vec3(1.0,0.0,0.0), -50.0 * RAD) * vec4(camDir, 1.0)).xyz;
 
-	vec3 areaLightPos = opTx(vec3(100.0,10.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
+	//vec3 areaLightPos = opTx(vec3(100.0,10.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
+	vec3 areaLightPos = vec3(0.0,10.0,-10.0);
 
 
 	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
@@ -244,11 +232,11 @@ void main()
 
 	if(intersect.exists)
 	{
-		vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
+		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
 
 		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
 		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
+		//float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
 		//intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect;
@@ -261,7 +249,7 @@ void main()
 		//}
 
 		//Soft Shadows
-		gl_FragColor = intersect.color;
+		gl_FragColor = intersect.color+0.2;
 	}		
 	else
 		//gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
