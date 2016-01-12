@@ -1,5 +1,7 @@
 #define PI 3.1459
 #define RAD PI / 180.0
+#define GAMMA (2.2) //***
+
 
 uniform vec3 iMouse;
 uniform vec2 iResolution;
@@ -16,14 +18,19 @@ varying vec2 uv;
 
 float time=iGlobalTime;
 int textureSize = 100;
+vec3 boxPos = vec3(-5.0,-1.5,boxPosZ);
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.3,1.0,0.3,1.0);
 vec4 planeColor = vec4(0.3,0.3,1.0,1.0);
 float shadowK = 24.0;
 
-const float epsilon = 0.01;
-const int maxIterations = 1750;
+const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
+const int maxIterations = 256;
 const float marchEpsilon = 0.001;
+
+// Gamma correction
+const float tau = 6.28318530717958647692;//***
+
 
 struct Intersection
 {
@@ -90,34 +97,6 @@ vec3 translate(vec4 point, mat4 translMatrix)
 	return (translMatrix*point).xyz;
 }
 
-vec3 opTx( vec3 p, mat4 m )
-{
-    vec3 q = inverse(m)*vec4(p,1.0);
-    return q;
-}
-
-float f(float x, float y)
-{
-	return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv*heightmapHeight;///cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
-	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //1.5 ist Wert, wie oft Würfel wiederholt werden
-
-}
-
-vec3 bisect(vec3 _pos, vec3 _direction, int counter)
-{
-	float step = marchEpsilon*0.5;
-	vec3 pos = _pos-_direction*step;
-
-	for(int i=0; i<counter; i++)
-	{
-		step = step*0.5;
-		if (pos.y <= f(pos.x, pos.z)*5.0)
-			pos = pos - step*_direction;
-		else
-			pos = pos + step*_direction;
-	}
-	return pos;
-}
 
 float distBox(vec3 p, vec3 b)
 {
@@ -132,26 +111,15 @@ float distBox2(vec3 p, vec3 b, vec3 m)
          length(max(d,0.0));
 }
 
-float distPlane(vec3 p, vec4 n, vec3 pos)
-{
-  // n must be normalized
-  //return dot(p-pos,n.xyz) + n.w;
-    return max(-distBox2(p, 10.0, vec3(5.0,-1.0,3.0)),(dot(p-pos,n.xyz) + n.w));
-
-}
-
 float distScene(vec3 point)
 {
+	globalColor = planeColor;
 	float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
-		*translationMatrix(vec3(-5.0,-0.0,boxPosZ)) //translation of cube
+		*translationMatrix(boxPos) //translation of cube
 		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/1.5*(PI/2))) //rotation around z-axis
 		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
 		vec3(0.5)); 
-	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
-	//globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-	globalColor = boxColor;
 
-	//globalColor = planeColor;
 	return distanceBox;
 }
 
@@ -173,13 +141,6 @@ vec3 getNormal(vec3 point)
 	return normalize(gradient);
 }
 
-vec3 getNormalHf(vec3 p)
-{
-    vec3 n = vec3( f(p.x-epsilon,p.z) - f(p.x+epsilon,p.z),
-                         2.0*epsilon,
-                         f(p.x,p.z-epsilon) - f(p.x,p.z+epsilon) );
-    return normalize( n );
-}
 
 float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
 {
@@ -209,7 +170,6 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	for(int i = 0; i <= maxIterations; i++)
 	{
 		t = distScene(newPos);
-		height = f(newPos.x, newPos.z);
 
 		if(t < epsilon)
 		{
@@ -222,23 +182,9 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 
 			return intersect;
 		}
-		else if(newPos.y <= height)
-		{
-			newPos = bisect(newPos, direction, 10); //TODO: raushauen?
-			//height = f(newPos.x, newPos.z)*heightmapHeight;
-			intersect.exists = true;
-			intersect.normal = getNormalHf(newPos);
-			
-			globalColor = planeColor;
-			intersect.color = globalColor;
-			
-			intersect.intersectP = newPos;
-
-			return intersect;
-		}
 		else
 		{
-			newPos += epsilon*direction;
+			newPos += t*direction;
 		}
 	}
 	intersect.intersectP = newPos;
@@ -246,53 +192,60 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	return intersect;
 }
 
-float shadow(vec3 pos, vec3 lightDir)
+vec3 ToLinear( in vec3 col )
 {
-	Intersection shadowIntersect = rayMarch(pos, -lightDir);
-	return shadowIntersect.exists ? 0.2 : 1.0;
+	// simulate a monitor, converting colour values into light values
+	return pow( col, vec3(GAMMA) );
 }
+
+vec3 ToGamma( in vec3 col )
+{
+	// convert back into colour values, so the correct light will come out of the monitor
+	return pow( col, vec3(1.0/GAMMA) );
+}
+
+vec4 Noise( in ivec2 x )
+{
+	return texture( tex, (vec2(x)+0.5)/256.0, -100.0 );
+}
+
+vec4 Rand( in int x )
+{
+	vec2 uv;
+	uv.x = (float(x)+0.5)/256.0;
+	uv.y = (floor(uv.x)+0.5)/256.0;
+	return texture( tex, uv, -100.0 );
+}
+
 
 void main()
 {
-	float fov = 90.0;
-	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
-	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
+	vec3 ray;
+	ray.xy = 2.0*(gl_FragCoord.xy-iResolution.xy*.5)/iResolution.x;
+	ray.z = 1.0;
 
-	vec3 camP = vec4(5.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(5.0,0.0,3.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
-	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
-	camDir = (lookAt(camP, vec3(5.0, 0.0,3.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
-
-	vec3 areaLightPos = vec3(0.0,10.0,-10.0);
-
-	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-	vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-
-
-	Intersection intersect = rayMarch(camP, camDir);
-
-	if(intersect.exists)
+	float offset = iGlobalTime*.5;	
+	float speed2 = (cos(offset)+1.0)*2.0;
+	float speed = speed2+.1;
+	offset += sin(offset)*.96;
+	offset *= 2.0;
+	
+	
+	vec3 col = vec3(0);
+	
+	vec3 stp = ray/max(abs(ray.x),abs(ray.y));
+	
+	vec3 pos = 2.0*stp+.5;
+	for ( int i=0; i < 20; i++ )
 	{
-		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
-
-		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
-		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		//float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
-		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
-		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		//intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect;
-
-		//Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
-		//if(reflIntersect.exists)
-		//{
-	//		float shadowReflect = max(0.2, softShadow(reflIntersect.intersectP, lightDir, 0.1, length(dirLightPos - reflIntersect.intersectP), shadowK));
-//			reflIntersect.color = reflIntersect.color*shadowReflect;
-		//}
-
-		//Soft Shadows
-		gl_FragColor = intersect.color+0.2;
-	}		
-	else
-		//gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
-		gl_FragColor = vec4(0.0,0.0,0.0,0.0);
-
-}		
+		float z = Noise(ivec2(pos.xy)).x;
+		z = fract(z-offset);
+		float d = 50.0*z-pos.z;
+		float w = pow(max(0.0,1.0-8.0*length(fract(pos.xy)-.5)),2.0);
+		vec3 c = max(vec3(0),vec3(1.0-abs(d+speed2*.5)/speed,1.0-abs(d)/speed,1.0-abs(d-speed2*.5)/speed));
+		col += 1.5*(1.0-z)*c*w;
+		pos += stp;
+	}
+	
+	gl_FragColor = vec4(ToGamma(col),1.0);
+}

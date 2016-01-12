@@ -16,13 +16,14 @@ varying vec2 uv;
 
 float time=iGlobalTime;
 int textureSize = 100;
+vec3 boxPos = vec3(-5.0,-1.5,boxPosZ);
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.3,1.0,0.3,1.0);
 vec4 planeColor = vec4(0.3,0.3,1.0,1.0);
 float shadowK = 24.0;
 
-const float epsilon = 0.01;
-const int maxIterations = 1750;
+const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
+const int maxIterations = 256;
 const float marchEpsilon = 0.001;
 
 struct Intersection
@@ -136,23 +137,22 @@ float distPlane(vec3 p, vec4 n, vec3 pos)
 {
   // n must be normalized
   //return dot(p-pos,n.xyz) + n.w;
-    return max(-distBox2(p, 10.0, vec3(5.0,-1.0,3.0)),(dot(p-pos,n.xyz) + n.w));
+    return max(-distBox2(p, 0.5, vec3(5.0,1.02,3.0)),(dot(p-pos,n.xyz) + n.w));
 
 }
 
 float distScene(vec3 point)
 {
+	globalColor = planeColor;
 	float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
-		*translationMatrix(vec3(-5.0,-0.0,boxPosZ)) //translation of cube
+		*translationMatrix(boxPos) //translation of cube
 		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/1.5*(PI/2))) //rotation around z-axis
 		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
 		vec3(0.5)); 
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
-	//globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-	globalColor = boxColor;
 
-	//globalColor = planeColor;
-	return distanceBox;
+	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
+	return distanceBox < distancePlane ? distanceBox : distancePlane;
 }
 
 vec3 getNormal(vec3 point)
@@ -209,7 +209,6 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	for(int i = 0; i <= maxIterations; i++)
 	{
 		t = distScene(newPos);
-		height = f(newPos.x, newPos.z);
 
 		if(t < epsilon)
 		{
@@ -222,23 +221,9 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 
 			return intersect;
 		}
-		else if(newPos.y <= height)
-		{
-			newPos = bisect(newPos, direction, 10); //TODO: raushauen?
-			//height = f(newPos.x, newPos.z)*heightmapHeight;
-			intersect.exists = true;
-			intersect.normal = getNormalHf(newPos);
-			
-			globalColor = planeColor;
-			intersect.color = globalColor;
-			
-			intersect.intersectP = newPos;
-
-			return intersect;
-		}
 		else
 		{
-			newPos += epsilon*direction;
+			newPos += t*direction;
 		}
 	}
 	intersect.intersectP = newPos;
@@ -258,9 +243,9 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(5.0,0.0,3.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
+	vec3 camP = vec4(5.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
-	camDir = (lookAt(camP, vec3(5.0, 0.0,3.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+	camDir = (lookAt(camP, vec3(-boxPos.xy, 3.5), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
 	vec3 areaLightPos = vec3(0.0,10.0,-10.0);
 
