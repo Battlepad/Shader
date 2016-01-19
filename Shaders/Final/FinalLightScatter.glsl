@@ -216,7 +216,7 @@ void main()
 	float aspectRatio = iResolution.x / iResolution.y;
 	
 	// camera XYZ in world space
-	vec3 camWsXYZ = vec3( 0.0, 3.0, 5.0 );
+	vec3 camWsXYZ = vec3( 0.0+sin(iGlobalTime), 3.0+sin(iGlobalTime), 5.0 );
 	
 	// construct the ray in world space
 	Ray ray;
