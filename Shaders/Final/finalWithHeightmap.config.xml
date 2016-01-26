@@ -121,24 +121,46 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>8</Time>
+          <Time>5</Time>
+          <Value>1</Value>
+        </Keyframe>
+      </Keyframes>
+    </SerializableUniform>
+    <SerializableUniform>
+      <UniformName>heightmapHeight</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>11</Time>
-          <Value>1</Value>
+          <Time>100</Time>
+          <Value>100</Value>
+        </Keyframe>
+      </Keyframes>
+    </SerializableUniform>
+    <SerializableUniform>
+      <UniformName>cubeHeightDiv</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>100</Time>
+          <Value>100</Value>
         </Keyframe>
       </Keyframes>
     </SerializableUniform>
   </Uniforms>
   <ShaderRatios>
     <ShaderPathRatio>
-      <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
+      <ShaderPath>.\FinalWithHeightmap.glsl</ShaderPath>
       <Ratio>1</Ratio>
     </ShaderPathRatio>
   </ShaderRatios>
   <Textures>
     <string>..\noisy-texture-100x100-o46-d10-c-858585-t0 (1).png</string>
   </Textures>
-  <SoundFileName>.\FinalPlaneCube.glsl</SoundFileName>
+  <SoundFileName>.\FinalWithHeightmap.glsl</SoundFileName>
 </DemoData>

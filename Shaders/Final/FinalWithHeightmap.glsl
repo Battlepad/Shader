@@ -9,6 +9,7 @@ uniform float tiltTime;
 uniform float tiltY;
 uniform float tiltZ;
 uniform float boxPosZ;
+uniform float boxPosY;
 uniform float cubeHeightDiv;
 uniform float heightmapHeight;
 
@@ -21,9 +22,9 @@ vec4 boxColor = vec4(0.3,1.0,0.3,1.0);
 vec4 planeColor = vec4(0.3,0.3,1.0,1.0);
 float shadowK = 24.0;
 
-const float epsilon = 0.01;
-const int maxIterations = 1750;
-const float marchEpsilon = 0.001;
+const float epsilon = 0.02;
+const int maxIterations = 1250;
+const float marchEpsilon = 0.01;
 
 struct Intersection
 {
@@ -85,11 +86,6 @@ mat4 lookAt(vec3 eye, vec3 center, vec3 up)
     return matrix;
 }
 
-vec3 translate(vec4 point, mat4 translMatrix)
-{
-	return (translMatrix*point).xyz;
-}
-
 vec3 opTx( vec3 p, mat4 m )
 {
     vec3 q = inverse(m)*vec4(p,1.0);
@@ -98,9 +94,9 @@ vec3 opTx( vec3 p, mat4 m )
 
 float f(float x, float y)
 {
-	return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv*heightmapHeight;///cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
-	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //1.5 ist Wert, wie oft Würfel wiederholt werden
-
+	return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*heightmapHeight/cubeHeightDiv;///cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
+	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //0.95 (lassen) ist Wert, wie oft Würfel wiederholt werden
+	//je höher, desto dichter (kleiner) sind cubes, je kleiner, desto größer sind cubes
 }
 
 vec3 bisect(vec3 _pos, vec3 _direction, int counter)
@@ -142,11 +138,8 @@ float distPlane(vec3 p, vec4 n, vec3 pos)
 
 float distScene(vec3 point)
 {
-	float distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
-		*translationMatrix(vec3(-5.0,-0.0,boxPosZ)) //translation of cube
-		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/1.5*(PI/2))) //rotation around z-axis
-		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
-		vec3(0.5)); 
+	float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
+		vec3(0.5),vec3(3.7,0.7,4.75)); //		vec3(0.5),vec3(4.5,boxPosY,4.5)); 
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
 	//globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	globalColor = boxColor;
