@@ -29,24 +29,60 @@
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>25.7001</Time>
-          <Value>1</Value>
-        </Keyframe>
-        <Keyframe>
           <Time>26.2</Time>
           <Value>1.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>30.76871</Time>
+          <Time>26.9</Time>
           <Value>1.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>31.93555</Time>
-          <Value>1.5</Value>
+          <Time>27.4</Time>
+          <Value>2</Value>
         </Keyframe>
         <Keyframe>
-          <Time>33.13555</Time>
-          <Value>1.5</Value>
+          <Time>28.1</Time>
+          <Value>2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>28.6</Time>
+          <Value>2.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3</Time>
+          <Value>2.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.8</Time>
+          <Value>3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.5</Time>
+          <Value>3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31</Time>
+          <Value>3.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7</Time>
+          <Value>3.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.2</Time>
+          <Value>4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.9</Time>
+          <Value>4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.4</Time>
+          <Value>4.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44</Time>
+          <Value>4.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -74,16 +110,36 @@
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>25.7001</Time>
+          <Time>26.9</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>26.2</Time>
+          <Time>26.9001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>27.4</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3001</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>33</Time>
+          <Time>31.7</Time>
           <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44</Time>
+          <Value>-0.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -115,8 +171,32 @@
           <Value>-0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>33.13555</Time>
+          <Time>28.1</Time>
           <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>28.1001</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.5</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.5001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.9</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.9001</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.13555</Time>
+          <Value>0.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -144,8 +224,56 @@
           <Value>2</Value>
         </Keyframe>
         <Keyframe>
-          <Time>44</Time>
+          <Time>26.9</Time>
           <Value>2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>26.9001</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>28.1</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>28.1001</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3001</Time>
+          <Value>-1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.5</Time>
+          <Value>-1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.5001</Time>
+          <Value>-2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7</Time>
+          <Value>-2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7001</Time>
+          <Value>-3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.9</Time>
+          <Value>-3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>32.9001</Time>
+          <Value>-4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44</Time>
+          <Value>-4</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -172,7 +300,7 @@
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>129.833</Time>
+          <Time>168.6959</Time>
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>
@@ -181,5 +309,5 @@
   <Textures>
     <string>..\noisy-texture-100x100-o46-d10-c-858585-t0 (1).png</string>
   </Textures>
-  <SoundFileName />
+  <SoundFileName>.\Sound\Perturbator - Future Club - Cyberpunk 2077 Edit.mp3</SoundFileName>
 </DemoData2>

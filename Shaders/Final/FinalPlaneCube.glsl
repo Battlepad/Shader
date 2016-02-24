@@ -155,8 +155,7 @@ float distScene(vec3 point)
 
 	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	//return distanceBox < distancePlane ? distanceBox : distancePlane;
-		//return distanceBox < distancePlane ? distanceBox : distancePlane;
-		return distanceBox;
+		return distanceBox < distancePlane ? distanceBox : distancePlane;
 
 }
 
@@ -248,7 +247,8 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);//*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
+	vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
+	//vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (lookAt(camP, vec3(-boxPos.xy, 3.5), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
