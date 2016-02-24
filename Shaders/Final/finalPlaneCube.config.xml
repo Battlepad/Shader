@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DemoData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<DemoData2 xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Uniforms>
-    <SerializableUniform>
+    <Uniform>
       <UniformName>tiltTime</UniformName>
       <Keyframes>
         <Keyframe>
@@ -9,24 +9,48 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.5</Time>
-          <Value>1.5</Value>
+          <Time>23.4</Time>
+          <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>5</Time>
-          <Value>1.5</Value>
+          <Time>23.9</Time>
+          <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>6.5</Time>
-          <Value>3</Value>
+          <Time>24.81874</Time>
+          <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>100</Time>
-          <Value>3</Value>
+          <Time>25.96886</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>27.16955</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>28.35461</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.56892</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>30.76871</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.93555</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.13555</Time>
+          <Value>0</Value>
         </Keyframe>
       </Keyframes>
-    </SerializableUniform>
-    <SerializableUniform>
+    </Uniform>
+    <Uniform>
       <UniformName>tiltY</UniformName>
       <Keyframes>
         <Keyframe>
@@ -34,28 +58,28 @@
           <Value>-0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.5</Time>
+          <Time>23.4</Time>
           <Value>-0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.51</Time>
+          <Time>23.9</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.9001</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>5</Time>
+          <Time>24</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>6.5</Time>
-          <Value>0.5</Value>
-        </Keyframe>
-        <Keyframe>
-          <Time>100</Time>
+          <Time>33.13555</Time>
           <Value>0.5</Value>
         </Keyframe>
       </Keyframes>
-    </SerializableUniform>
-    <SerializableUniform>
+    </Uniform>
+    <Uniform>
       <UniformName>tiltZ</UniformName>
       <Keyframes>
         <Keyframe>
@@ -83,37 +107,29 @@
           <Value>0.5</Value>
         </Keyframe>
       </Keyframes>
-    </SerializableUniform>
-    <SerializableUniform>
+    </Uniform>
+    <Uniform>
       <UniformName>boxPosZ</UniformName>
       <Keyframes>
         <Keyframe>
           <Time>0</Time>
-          <Value>-3</Value>
+          <Value>4</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.5</Time>
-          <Value>-3</Value>
+          <Time>23.9</Time>
+          <Value>4</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.51</Time>
-          <Value>-4</Value>
-        </Keyframe>
-        <Keyframe>
-          <Time>5</Time>
-          <Value>-4</Value>
-        </Keyframe>
-        <Keyframe>
-          <Time>6.5</Time>
-          <Value>-4</Value>
+          <Time>23.90001</Time>
+          <Value>3</Value>
         </Keyframe>
         <Keyframe>
           <Time>100</Time>
-          <Value>-4</Value>
+          <Value>3</Value>
         </Keyframe>
       </Keyframes>
-    </SerializableUniform>
-    <SerializableUniform>
+    </Uniform>
+    <Uniform>
       <UniformName>boxPosY</UniformName>
       <Keyframes>
         <Keyframe>
@@ -121,24 +137,29 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>8</Time>
+          <Time>36.12423</Time>
           <Value>0</Value>
         </Keyframe>
-        <Keyframe>
-          <Time>11</Time>
-          <Value>1</Value>
-        </Keyframe>
       </Keyframes>
-    </SerializableUniform>
+    </Uniform>
   </Uniforms>
-  <ShaderRatios>
-    <ShaderPathRatio>
-      <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
-      <Ratio>1</Ratio>
-    </ShaderPathRatio>
-  </ShaderRatios>
+  <Tracks>
+    <Track>
+      <Name>sum</Name>
+      <ShaderKeyframes>
+        <ShaderKeyframe>
+          <Time>0</Time>
+          <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
+        </ShaderKeyframe>
+        <ShaderKeyframe>
+          <Time>129.833</Time>
+          <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
+        </ShaderKeyframe>
+      </ShaderKeyframes>
+    </Track>
+  </Tracks>
   <Textures>
     <string>..\noisy-texture-100x100-o46-d10-c-858585-t0 (1).png</string>
   </Textures>
-  <SoundFileName>.\FinalPlaneCube.glsl</SoundFileName>
-</DemoData>
+  <SoundFileName />
+</DemoData2>

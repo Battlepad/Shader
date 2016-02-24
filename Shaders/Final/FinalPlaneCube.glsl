@@ -147,13 +147,16 @@ float distScene(vec3 point)
 	globalColor = planeColor;
 	float distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
 		*translationMatrix(boxPos) //translation of cube
-		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/1.5*(PI/2))) //rotation around z-axis
+		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/0.5*(PI/2))) //rotation around z-axis
 		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
 		vec3(0.5), vec3(0.0,boxPosY,0.0)); 
+
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
 
 	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-	return distanceBox < distancePlane ? distanceBox : distancePlane;
+	//return distanceBox < distancePlane ? distanceBox : distancePlane;
+		return distanceBox < distancePlane ? distanceBox : distancePlane;
+
 }
 
 vec3 getNormal(vec3 point)
@@ -244,7 +247,7 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
+	vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);//*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (lookAt(camP, vec3(-boxPos.xy, 3.5), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
