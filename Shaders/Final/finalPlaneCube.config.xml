@@ -17,36 +17,36 @@
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>24.81874</Time>
+          <Time>24.5</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>25.96886</Time>
+          <Time>25</Time>
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>27.16955</Time>
+          <Time>25.7</Time>
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>28.35461</Time>
-          <Value>0</Value>
+          <Time>25.7001</Time>
+          <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>29.56892</Time>
-          <Value>0</Value>
+          <Time>26.2</Time>
+          <Value>1.5</Value>
         </Keyframe>
         <Keyframe>
           <Time>30.76871</Time>
-          <Value>0</Value>
+          <Value>1.5</Value>
         </Keyframe>
         <Keyframe>
           <Time>31.93555</Time>
-          <Value>0</Value>
+          <Value>1.5</Value>
         </Keyframe>
         <Keyframe>
           <Time>33.13555</Time>
-          <Value>0</Value>
+          <Value>1.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -70,11 +70,19 @@
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>24</Time>
+          <Time>25.7</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>33.13555</Time>
+          <Time>25.7001</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>26.2</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33</Time>
           <Value>0.5</Value>
         </Keyframe>
       </Keyframes>
@@ -87,24 +95,28 @@
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.5</Time>
+          <Time>23.4</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>1.51</Time>
+          <Time>23.9</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>5</Time>
+          <Time>23.9001</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>6.5</Time>
+          <Time>25.7</Time>
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>100</Time>
-          <Value>0.5</Value>
+          <Time>25.7001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.13555</Time>
+          <Value>-0.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -124,8 +136,16 @@
           <Value>3</Value>
         </Keyframe>
         <Keyframe>
-          <Time>100</Time>
+          <Time>25.7</Time>
           <Value>3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>25.7001</Time>
+          <Value>2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44</Time>
+          <Value>2</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>

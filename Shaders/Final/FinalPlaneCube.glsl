@@ -155,7 +155,8 @@ float distScene(vec3 point)
 
 	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	//return distanceBox < distancePlane ? distanceBox : distancePlane;
-		return distanceBox < distancePlane ? distanceBox : distancePlane;
+		//return distanceBox < distancePlane ? distanceBox : distancePlane;
+		return distanceBox;
 
 }
 
