@@ -6,6 +6,7 @@ uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform sampler2D tex;
 uniform float tiltTime;
+uniform float tiltX;
 uniform float tiltY;
 uniform float tiltZ;
 uniform float boxPosZ;
@@ -138,24 +139,36 @@ float distPlane(vec3 p, vec4 n, vec3 pos)
 {
   // n must be normalized
   //return dot(p-pos,n.xyz) + n.w;
-    return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(p-pos,n.xyz) + n.w));
+    return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(vec3(p.x, p.y+sin(p.z - iGlobalTime * 6.0) * cos(p.x - iGlobalTime) * .25, p.z)-pos,n.xyz) + n.w));
 
 }
 
 float distScene(vec3 point)
 {
 	globalColor = planeColor;
-	float distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
-		*translationMatrix(boxPos) //translation of cube
-		*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/0.5*(PI/2))) //rotation around z-axis
-		*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
-		vec3(0.5), vec3(0.0,boxPosY,0.0)); 
+	float distanceBox;
+	if(iGlobalTime<33.5)
+	{
+		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
+			*translationMatrix(boxPos) //translation of cube
+			*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/0.5*(PI/2))) //rotation around z-axis
+			*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
+			vec3(0.5), vec3(0.0,boxPosY,0.0)); 
+	}
+	else
+	{
+		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
+			*translationMatrix(vec3(-5.0,boxPosY,-4.5)) //translation of cube
+			*rotationMatrix(vec3(tiltX,tiltY,tiltZ), tiltTime)) //rotation around z-axis
+			*translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+			vec3(0.5), vec3(0.0,0.0,0.0)); 
+	}
 
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
 
 	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	//return distanceBox < distancePlane ? distanceBox : distancePlane;
-		return distanceBox < distancePlane ? distanceBox : distancePlane;
+	return distanceBox < distancePlane ? distanceBox : distancePlane;
 
 }
 

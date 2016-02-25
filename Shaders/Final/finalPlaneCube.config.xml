@@ -81,8 +81,24 @@
           <Value>4.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>44</Time>
+          <Time>33.5</Time>
           <Value>4.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.5001</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>40.5</Time>
+          <Value>4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>48.42831</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>52.5366478</Time>
+          <Value>0</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -135,6 +151,14 @@
         </Keyframe>
         <Keyframe>
           <Time>31.7001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.5</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>39.8</Time>
           <Value>-0.5</Value>
         </Keyframe>
         <Keyframe>
@@ -195,7 +219,7 @@
           <Value>0.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>33.13555</Time>
+          <Time>41.87</Time>
           <Value>0.5</Value>
         </Keyframe>
       </Keyframes>
@@ -285,8 +309,93 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>36.12423</Time>
+          <Time>33.5</Time>
           <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.5001</Time>
+          <Value>-2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>36</Time>
+          <Value>-2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>41.87</Time>
+          <Value>-5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>52.5</Time>
+          <Value>-1</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>tiltX</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.4</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.9</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.9001</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>25.7</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>26.9</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>26.9001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>27.4</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>29.3001</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7</Time>
+          <Value>0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>31.7001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.5</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.5001</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>39.8</Time>
+          <Value>-0.5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44</Time>
+          <Value>-0.5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -300,7 +409,7 @@
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>168.6959</Time>
+          <Time>219.19165</Time>
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

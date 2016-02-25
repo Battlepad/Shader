@@ -35,7 +35,7 @@ float distScene(vec3 point)
 	point = coordinateRep(point, vec3(1.0, 1.0, 1.0));
 	float distTorus = torus(point, vec2(0.3, 0.06));
 	float distSphere = sphere(point, vec3(0.0, 0.0, 0.0), 0.2);
-	return min(distPlane, distSphere);
+	return distPlane;
 }
 
 //by numerical gradient
