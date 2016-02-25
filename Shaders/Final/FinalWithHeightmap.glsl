@@ -24,7 +24,7 @@ float shadowK = 24.0;
 
 const float epsilon = 0.02;
 const int maxIterations = 1250;
-const float marchEpsilon = 0.01;
+const float marchEpsilon = 0.001;
 
 struct Intersection
 {
@@ -94,7 +94,7 @@ vec3 opTx( vec3 p, mat4 m )
 
 float f(float x, float y)
 {
-	return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*heightmapHeight/cubeHeightDiv;///cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
+	return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*heightmapHeight/cubeHeightDiv;//cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
 	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //0.95 (lassen) ist Wert, wie oft Würfel wiederholt werden
 	//je höher, desto dichter (kleiner) sind cubes, je kleiner, desto größer sind cubes
 }
@@ -139,7 +139,7 @@ float distPlane(vec3 p, vec4 n, vec3 pos)
 float distScene(vec3 point)
 {
 	float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
-		vec3(0.5),vec3(3.7,0.7,4.75)); //		vec3(0.5),vec3(4.5,boxPosY,4.5)); 
+		vec3(0.5),vec3(15.0,0.7,15.0)); //		vec3(0.5),vec3(4.5,boxPosY,4.5)); 
 	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
 	//globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	globalColor = boxColor;
@@ -197,14 +197,14 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	newPos += 1.0*direction;
 
 	float height = 0; //TODO; 0 = guter Init wert?
-	float t = 1000;
+	//float t = 1000;
 
 	for(int i = 0; i <= maxIterations; i++)
 	{
-		t = distScene(newPos);
+		//t = distScene(newPos);
 		height = f(newPos.x, newPos.z);
 
-		if(t < epsilon)
+		/*if(t < epsilon)
 		{
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
@@ -214,8 +214,8 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			intersect.intersectP = newPos;
 
 			return intersect;
-		}
-		else if(newPos.y <= height)
+		}*/
+		if(newPos.y <= height)
 		{
 			newPos = bisect(newPos, direction, 10); //TODO: raushauen?
 			//height = f(newPos.x, newPos.z)*heightmapHeight;
@@ -251,9 +251,9 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(5.0,0.0,3.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
+	vec3 camP = vec4(5.0, 7.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(15.0,0.0,15.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
-	camDir = (lookAt(camP, vec3(5.0, 0.0,3.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+	camDir = (lookAt(camP, vec3(15.0, 0.0,15.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
 	vec3 areaLightPos = vec3(0.0,10.0,-10.0);
 

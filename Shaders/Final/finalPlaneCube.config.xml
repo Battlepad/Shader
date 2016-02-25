@@ -399,6 +399,64 @@
         </Keyframe>
       </Keyframes>
     </Uniform>
+    <Uniform>
+      <UniformName>cubeHeightDiv</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>53.1692543</Time>
+          <Value>30</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>62.13228</Time>
+          <Value>30</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>30</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>heightmapHeight</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>49.7601242</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>52.13</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>53.1692543</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>53.3873253</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>62.13228</Time>
+          <Value>200</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>82.013176</Time>
+          <Value>200</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>129.933</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
   </Uniforms>
   <Tracks>
     <Track>
@@ -409,7 +467,11 @@
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>219.19165</Time>
+          <Time>52.860363</Time>
+          <ShaderPath>.\FinalWithHeightmap.glsl</ShaderPath>
+        </ShaderKeyframe>
+        <ShaderKeyframe>
+          <Time>168.966751</Time>
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

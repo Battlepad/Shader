@@ -135,11 +135,17 @@ float distBox2(vec3 p, vec3 b, vec3 m)
          length(max(d,0.0));
 }
 
+float plane(vec3 point, vec3 normal, float d) {
+    //return max(-distBox2(vec3(point.x, point.y+sin(point.z - iGlobalTime * 6.0) * cos(point.x - iGlobalTime) * .25, point.z), 0.5, vec3(5.0,1.02,4.5)), dot(vec3(point.x, point.y+sin(point.z - iGlobalTime * 6.0) * cos(point.x - iGlobalTime) * .25, point.z), normal) - d);
+        return max(-distBox2(point, 0.5, vec3(5.0,1.02,4.5)),dot(point, normal) - d);
+
+}
+
 float distPlane(vec3 p, vec4 n, vec3 pos)
 {
   // n must be normalized
   //return dot(p-pos,n.xyz) + n.w;
-    return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(vec3(p.x, p.y+sin(p.z - iGlobalTime * 6.0) * cos(p.x - iGlobalTime) * .25, p.z)-pos,n.xyz) + n.w));
+    return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(p-pos,n.xyz) + n.w));
 
 }
 
@@ -164,7 +170,8 @@ float distScene(vec3 point)
 			vec3(0.5), vec3(0.0,0.0,0.0)); 
 	}
 
-	float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
+	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
+	float distancePlane = plane(point, vec3(0.0,1.0,0.0), 1.5);
 
 	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
 	//return distanceBox < distancePlane ? distanceBox : distancePlane;
@@ -260,7 +267,7 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
+	vec3 camP = vec4(8.0, 5.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
 	//vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (lookAt(camP, vec3(-boxPos.xy, 3.5), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
