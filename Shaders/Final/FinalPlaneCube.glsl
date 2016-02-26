@@ -13,6 +13,8 @@ uniform float boxPosZ;
 uniform float boxPosY;
 uniform float cubeHeightDiv;
 uniform float heightmapHeight;
+uniform float soundIntensity;
+uniform float lightIntensityAbove;
 
 varying vec2 uv;
 
@@ -298,7 +300,7 @@ void main()
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 		float lightIntensity1 = max(0.4*(2.0-distance(intersect.intersectP, holePosAbove)),0.0);
 		float lightIntensity2 = max(1.0*(1.0-distance(intersect.intersectP, holePosIn)),0.0);
-		intersect.color += lightIntensity1*lightColor1 + lightIntensity2*lightColor2;
+		intersect.color += (lightIntensity1*lightColor1)*lightIntensityAbove + (lightIntensity2*lightColor2)*soundIntensity;
 
 		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
 		//intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect;

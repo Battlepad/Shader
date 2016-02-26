@@ -24,7 +24,7 @@ float shadowK = 24.0;
 
 const float epsilon = 0.02;
 const int maxIterations = 1250;
-const float marchEpsilon = 0.001;
+const float marchEpsilon = 0.005;
 
 struct Intersection
 {
@@ -197,14 +197,14 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	newPos += 1.0*direction;
 
 	float height = 0; //TODO; 0 = guter Init wert?
-	//float t = 1000;
+	float t = 1000;
 
 	for(int i = 0; i <= maxIterations; i++)
 	{
-		//t = distScene(newPos);
+		t = distScene(newPos);
 		height = f(newPos.x, newPos.z);
 
-		/*if(t < epsilon)
+		if(t < epsilon)
 		{
 			intersect.exists = true;
 			intersect.normal = getNormal(newPos);
@@ -214,10 +214,11 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			intersect.intersectP = newPos;
 
 			return intersect;
-		}*/
-		if(newPos.y <= height)
+		}
+		else if(newPos.y <= height)
 		{
 			newPos = bisect(newPos, direction, 10); //TODO: raushauen?
+
 			//height = f(newPos.x, newPos.z)*heightmapHeight;
 			intersect.exists = true;
 			intersect.normal = getNormalHf(newPos);
@@ -251,7 +252,7 @@ void main()
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(5.0, 7.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(15.0,0.0,15.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
+	vec3 camP = vec4(7.0, 6.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(15.0,0.0,15.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (lookAt(camP, vec3(15.0, 0.0,15.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
