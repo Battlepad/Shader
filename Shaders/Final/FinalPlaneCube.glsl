@@ -263,6 +263,9 @@ float shadow(vec3 pos, vec3 lightDir)
 
 void main()
 {
+	vec2 uv =  gl_FragCoord.xy/iResolution.x;
+
+
 	float fov = 90.0;
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
@@ -277,6 +280,11 @@ void main()
 	vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 	vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
 
+	vec3 holePosAbove = vec3(5.0,3.02,4.5);
+	vec3 holePosIn = vec3(5.0,1.02,4.5);
+	vec4 lightColor1 = vec4(1.0, 0.3, 0.3, 1.0);
+	vec4 lightColor2 = vec4(1.0, 0.3, 0.3, 1.0);
+
 
 	Intersection intersect = rayMarch(camP, camDir);
 
@@ -288,6 +296,10 @@ void main()
 		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
 		//float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
+		float lightIntensity1 = max(0.4*(2.0-distance(intersect.intersectP, holePosAbove)),0.0);
+		float lightIntensity2 = max(1.0*(1.0-distance(intersect.intersectP, holePosIn)),0.0);
+		intersect.color += lightIntensity1*lightColor1 + lightIntensity2*lightColor2;
+
 		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
 		//intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect;
 
