@@ -5,7 +5,7 @@ uniform float iGlobalTime;
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 
-const vec3 boxPos = vec3(15.0,0.7,-5.0);
+const vec3 boxPos = vec3(0.0,0.0,10.0);
 
 struct Intersection
 {
@@ -38,16 +38,38 @@ vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
     return mod(P,b)-b/2;
 }
 
-float distScene(vec3 point){
+mat4 rotationMatrix(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
+mat4 translationMatrix(vec3 delta)
+{
+    return mat4(    1.0,    0.0,    0.0,    delta.x,
+                    0.0,    1.0,    0.0,    delta.y,
+                    0.0,    0.0,    1.0,    delta.z,
+                    0.0,    0.0,    0.0,    1.0     );
+}
+
+
+/*float distScene(vec3 point){
     vec3 spherePos = vec3(0.0,0.0,0.0);
-    float radius = 1.500;
-    vec3 b = vec3(60.0,50.0,50.0+iGlobalTime*5);
+    float radius = 0.400;
+    vec3 b = vec3(8.0,8.0,8.0);
     float dist = distSphere(repeat(point, b), spherePos, radius);
     return dist;
 
-}
+}*/
 
-/*float distScene(vec3 point)
+float distSceneReflection(vec3 point)
 {
     float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
         vec3(2.0),boxPos); //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
@@ -55,12 +77,29 @@ float distScene(vec3 point){
     //globalColor = boxColor;
 
     //globalColor = planeColor;
-        vec3 b = vec3(50.0,20.0,10.0);
+        vec3 b = vec3(8.0,8.0,8.0);
 
     return distBox(repeat(point, b),
         vec3(0.5));
     //return distanceBox;
-}*/
+}
+
+
+float distScene(vec3 point)
+{
+    //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
+        //vec3(2.0),boxPos);*/ //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
+    //globalColor = distanceBox < distancePlane ? boxColor : planeColor;
+    //globalColor = boxColor;
+
+    //globalColor = planeColor;
+    float distanceBox = distBox((((vec4(point.xyz,1.0)
+            *translationMatrix(vec3(0.0,0.0,-3.5))) //translation of cube
+            *rotationMatrix(vec3(1.0,0.0,0.1), iGlobalTime)) //rotation around z-axis
+            *translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            vec3(0.5)); 
+    return distanceBox;
+}
 
 vec3 getNormal(vec3 point)
 {
@@ -88,8 +127,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
     vec3 newPos = origin;
     newPos += 1.0*direction;
 
-    float height = 0; //TODO; 0 = guter Init wert?
-    float t = 1000;
+    float t = 1000.0;
 
     for(int i = 0; i <= maxIterations; i++)
     {
@@ -100,7 +138,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = vec4(1.0,0.5,0.5,1.0);
+            intersect.color = vec4(1.0,i/maxIterations,0.5,1.0);
             
             intersect.intersectP = newPos;
 
@@ -156,7 +194,7 @@ void main()
     float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-    vec3 camP = vec4(8.0, 5.0, 0.0, 1.0+iGlobalTime*10);
+    vec3 camP = vec3(0.0, 0.0, 0.0);
     //vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
     vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
     //camDir = (lookAt(camP, vec3(boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
@@ -170,13 +208,15 @@ void main()
 
     if(intersect.exists)
     {
-        intersect.color = intersect.color;
+        
         gl_FragColor = intersect.color;
+
+//        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);
     }       
     else
     {
         //gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
-         vec2 position = ( gl_FragCoord.xy - iResolution.xy*.5 ) / iResolution.x;
+        vec2 position = ( gl_FragCoord.xy - iResolution.xy*.5 ) / iResolution.x;
 
         // 256 angle steps
         float angle = atan(position.y,position.x)/(2.*3.14159265359);
@@ -200,8 +240,8 @@ void main()
             
             angle = fract(angle);
         }    
-    //gl_FragColor = vec4(color,color,color,1.0);
-    gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    gl_FragColor = vec4(color,color,color,1.0);
+    //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 
     }
 }
