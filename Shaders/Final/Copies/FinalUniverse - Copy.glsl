@@ -23,6 +23,12 @@ float distBox2(vec3 p, vec3 b, vec3 m)
          length(max(d,0.0));
 }
 
+float sdTorus( vec3 p, vec2 t )
+{
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+
 /*float distBox(vec3 p, vec3 b)
 {
   vec3 d = abs(p) - b;
@@ -33,6 +39,13 @@ float distBox2(vec3 p, vec3 b, vec3 m)
 float distBox( in vec3 p, vec3 data )
 {
     return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
+}
+
+float opDisplace( vec3 p )
+{
+    float d1 = sdTorus(p, vec2(1.5,0.5));
+    float d2 = sin(iGlobalTime*5*p.x)*sin(iGlobalTime*5*p.y)*sin(iGlobalTime*5*p.z);
+    return d1+d2;
 }
 
 float distSphere(vec3 p, vec3 m, float r){
@@ -112,11 +125,13 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
-    float distanceBox = distBox(((vec4(point.xyz,1.0)
+    /*float distanceBox = distBox(((vec4(point.xyz,1.0)
             *translationMatrix(boxPos) //translation of cube
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
-            vec3(0.5)); 
+            vec3(0.5)); */
+    //float distanceBox = opDisplace(point);
+    float distanceBox = opDisplace(vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,-10.0)));  
     return distanceBox;
 }
 
@@ -250,11 +265,11 @@ void main()
     float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-    vec3 camP = vec4(0, 0, 5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
+    vec3 camP = vec4(0.0, 0.0, -10.0, 0.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
     //vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
     vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
     //camDir = (lookAt(camP, vec3(boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
-    camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+    //camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
     vec3 areaLightPos = vec3(0.0,10.0,-10.0);
 
@@ -267,23 +282,19 @@ void main()
 
     if(intersect.exists)
     {
-        Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+        /*Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
         if(distance(reflectionIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionIntersect.intersectP, intersect.intersectP) < 75)
         {
             gl_FragColor = intersect.color+reflectionIntersect.color;
         }
         else
-        {
+        {*/
             gl_FragColor = intersect.color;
 
-        }
+        //}
 
 //        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);
     }   
-    /*else if(reflectionIntersect2.exists)   
-    {
-        gl_FragColor = reflectionIntersect2.color;
-    } */
     else
     {
         //gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));

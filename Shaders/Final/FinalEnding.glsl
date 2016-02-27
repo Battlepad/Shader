@@ -16,27 +16,18 @@ struct Intersection
     bool exists;
 };
 
-float distBox2(vec3 p, vec3 b, vec3 m)
-{
-  vec3 d = abs(p-m) - b;
-  return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
+float distSphere(vec3 p, vec3 m, float r){
+    return length(p - m) - r;
 }
-
-/*float distBox(vec3 p, vec3 b)
-{
-  vec3 d = abs(p) - b;
-  return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
-}*/
 
 float distBox( in vec3 p, vec3 data )
 {
     return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
 }
 
-float distSphere(vec3 p, vec3 m, float r){
-    return length(p - m) - r;
+float opS( float d1, float d2 )
+{
+    return max(-d1,d2);
 }
 
 vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
@@ -70,16 +61,6 @@ mat4 translationMatrix(vec3 delta)
                     0.0,    0.0,    0.0,    1.0     );
 }
 
-
-/*float distScene(vec3 point){
-    vec3 spherePos = vec3(0.0,0.0,0.0);
-    float radius = 0.400;
-    vec3 b = vec3(8.0,8.0,8.0);
-    float dist = distSphere(repeat(point, b), spherePos, radius);
-    return dist;
-
-}*/
-
 float distSceneReflection(vec3 point)
 {
     //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
@@ -112,12 +93,15 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
-    float distanceBox = distBox(((vec4(point.xyz,1.0)
-            *translationMatrix(boxPos) //translation of cube
-            *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
-            *translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
-            vec3(0.5)); 
-    return distanceBox;
+    vec3 spherePos = vec3(0.0,0.0,5.0);
+    vec3 spherePosTmp = vec3(5.0,0.0,45.0);
+    float distanceSphere = distSphere(vec4(point.xyz,1.0)*translationMatrix(spherePos), vec3(0.0), 0.5);
+    //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
+
+    float distancePlanet = opS(distSphere(vec4(point.xyz,1.0)*translationMatrix(spherePosTmp), vec3(0.0), 10.0),distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10));
+    //(vec4(point.xyz,1.0)*translationMatrix(0.0,0.0,5.0)).xyz
+             //translation of cube
+    return min(distanceSphere,distancePlanet);
 }
 
 vec3 getNormal(vec3 point)
@@ -207,8 +191,6 @@ Intersection rayMarchReflect(vec3 origin, vec3 direction)
     intersect.color = vec4(0.0,0.0,0.0,0.0);
     return intersect;
 }
-
-
 
 mat4 lookAt(vec3 eye, vec3 center, vec3 up)
 {
