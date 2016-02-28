@@ -309,6 +309,18 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
+          <Time>22.9914379</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.1</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.48054</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>33.5</Time>
           <Value>0</Value>
         </Keyframe>
@@ -317,7 +329,7 @@
           <Value>-2</Value>
         </Keyframe>
         <Keyframe>
-          <Time>36</Time>
+          <Time>33.5002</Time>
           <Value>-2</Value>
         </Keyframe>
         <Keyframe>
@@ -325,7 +337,15 @@
           <Value>-5</Value>
         </Keyframe>
         <Keyframe>
+          <Time>51.81</Time>
+          <Value>-1.2</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>52.8</Time>
+          <Value>-1.1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>54.0396042</Time>
           <Value>-1</Value>
         </Keyframe>
       </Keyframes>
@@ -714,7 +734,7 @@
         </Keyframe>
         <Keyframe>
           <Time>49.97423</Time>
-          <Value>3.98526716</Value>
+          <Value>5</Value>
         </Keyframe>
         <Keyframe>
           <Time>52.65803</Time>
@@ -743,6 +763,73 @@
         </Keyframe>
       </Keyframes>
     </Uniform>
+    <Uniform>
+      <UniformName>camPosX</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>15</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>22.9914379</Time>
+          <Value>14</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.33616</Time>
+          <Value>14</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.48054</Time>
+          <Value>6</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>5</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>camPosMove</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>21.26</Time>
+          <Value>1.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>22.9914379</Time>
+          <Value>1.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>33.48054</Time>
+          <Value>1.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>1.3</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>camPosY</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>23.1</Time>
+          <Value>2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>4.2</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
   </Uniforms>
   <Tracks>
     <Track>
@@ -753,15 +840,15 @@
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>68.6915741</Time>
+          <Time>54.44676</Time>
           <ShaderPath>.\FinalWithHeightmap.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>80.30393</Time>
+          <Time>59.1379929</Time>
           <ShaderPath>.\FinalUniverse.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>116.659561</Time>
+          <Time>106.375961</Time>
           <ShaderPath>.\FinalEnding.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>
