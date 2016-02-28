@@ -840,15 +840,15 @@
           <ShaderPath>.\FinalPlaneCube.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>54.44676</Time>
+          <Time>54.6543579</Time>
           <ShaderPath>.\FinalWithHeightmap.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>59.1379929</Time>
+          <Time>60.74982</Time>
           <ShaderPath>.\FinalUniverse.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>106.375961</Time>
+          <Time>122.127533</Time>
           <ShaderPath>.\FinalEnding.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

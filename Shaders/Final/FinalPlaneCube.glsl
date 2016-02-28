@@ -318,13 +318,7 @@ void main()
 	vec3 holePosAbove = vec3(5.0,3.02,4.5);
 	vec4 lightColor1 = vec4(1.0, 0.392, 0.322, 1.0);
 
-
-
-	//vec3 camP = vec4(8.0, 5.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime*0.5)*translationMatrix(vec3(-boxPos.xy, 3.5));
-//	vec3 camP = vec4(8.0, 3.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 1.3)*translationMatrix(vec3(-boxPos.xy, 3.5));
 	vec3 camP = vec4(camPosX, camPosY, -1.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), camPosMove)*translationMatrix(vec3(holePosIn.x, 1.0, holePosIn.z));
-
-	//vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
 	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
 	camDir = (lookAt(camP, vec3(holePosIn.x, 3.0, holePosIn.z), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
