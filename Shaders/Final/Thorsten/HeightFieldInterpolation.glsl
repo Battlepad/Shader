@@ -1,7 +1,6 @@
 uniform vec2 iResolution;
 uniform float iGlobalTime;
-uniform sampler2D tex;
-uniform sampler2D tex1;
+uniform samplerCube tex;
 
 /************************************************************
 *	Input Uniforms
@@ -50,7 +49,7 @@ struct Ray
 
 struct Material
 {
-	sampler2D tex;
+	samplerCube tex;
 	float Shininess;
 	float reflection;
 	vec4 color;
@@ -122,8 +121,8 @@ Ray Init()
 
 	Ray r1; 
 	// r1.origin = vec3(sin(iGlobalTime)*10, 100.0 ,cos(iGlobalTime));
-	r1.direction = Rotate(vec3(p.x, p.y, 1), vec3(90.0, angleY, angleZ));
-	r1.origin = vec3(cameraX, cameraY, cameraZ);
+	r1.direction = Rotate(vec3(p.x, p.y, 1), vec3(45.0, 0, 0));
+	r1.origin = vec3(0, 10, 0);
 	// r1.direction = normalize(vec3(p.x, p.y, 1.0));
 	return r1;
 }
@@ -182,7 +181,6 @@ vec3 Blur(vec3 p)
 			// blur1 += texture(tex, uv+vec2(i, j));
 			// blur2 += texture(tex1, uv+vec2(i, j));
 			blur1 += texture(tex, (p.xz+vec2(i, j))/SIZE);
-			blur2 += texture(tex1, (p.xz+vec2(i, j))/SIZE);
 		}
 	}
 	blur1 /= 4.0 * blurSize * blurSize;
@@ -195,8 +193,7 @@ vec3 Blur(vec3 p)
 float heightCalcing(vec3 p)
 {
 	float height_1 = texture(tex, p.xz /SIZE).x * HEIGHT;
-	float height_2 = texture(tex1, p.xz /SIZE).x * HEIGHT; 
-	return mix(height_1, height_2, interpolate);
+	return height_1;
 }
 
 
@@ -288,8 +285,7 @@ Intersection RayMarching(Ray cam)
 			intersect.exists = true;
 			intersect.intersectP = BiSection(cam.origin, cam.direction, t);
 			color1 = vec4(texture(tex, intersect.intersectP.xz/SIZE).rgb, 1.0);
-			color2 = vec4(texture(tex1, intersect.intersectP.xz/SIZE).rgb, 1.0);
-			intersect.mat.color = mix(color1, color2, interpolate);
+			intersect.mat.color = color1;
 			intersect.mat.color *= CalcLighting(intersect.intersectP);
 			//intersect.mat.color = intersect.mat.color * vec4(0.6, 0.75, 0.55, 1.0);
 			intersect.mat.color = ApplyFog(intersect.mat.color, min(0.1, t/100.0));

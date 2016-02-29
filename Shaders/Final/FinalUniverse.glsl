@@ -2,9 +2,14 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 
+uniform float boxColorInterpolate;
+
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
+
+vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
+
 
 //const vec3 boxPos = vec3(0.0,0.0,10.0);
 
@@ -157,7 +162,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = vec4(0.5,1.0,0.5,1.0);
+            intersect.color = boxColor;
             
             intersect.intersectP = newPos;
 
@@ -268,11 +273,11 @@ void main()
         Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
         if(distance(reflectionIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionIntersect.intersectP, intersect.intersectP) < 75)
         {
-            gl_FragColor = intersect.color+reflectionIntersect.color;
+            gl_FragColor = mix(intersect.color+reflectionIntersect.color, vec4(0.0), boxColorInterpolate);
         }
         else
         {
-            gl_FragColor = intersect.color;
+            gl_FragColor = mix(intersect.color, vec4(0.0), boxColorInterpolate);
 
         }
 
@@ -309,7 +314,7 @@ void main()
             
             angle = fract(angle);
         }    
-    gl_FragColor = vec4(color,color,color,1.0);
+    gl_FragColor = mix(vec4(color,color,color,1.0), vec4(0.0), boxColorInterpolate);
     //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 
     }

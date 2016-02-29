@@ -14,6 +14,9 @@ uniform float boxPosY;
 uniform float camPosMove;
 uniform float camPosX;
 uniform float camPosY;
+
+uniform float boxColorInterpolate;
+
 uniform float cubeHeightDiv;
 uniform float heightmapHeight;
 uniform float soundIntensity;
@@ -29,7 +32,7 @@ vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
 vec4 planeColor = vec4(0.31,0.439,0.812,1.0);
 float shadowK = 18.0;
 
-const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
+const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 const float marchEpsilon = 0.001;
 
@@ -104,29 +107,6 @@ vec3 opTx( vec3 p, mat4 m )
     return q;
 }
 
-float f(float x, float y)
-{
-	return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv*heightmapHeight;///cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
-	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //1.5 ist Wert, wie oft Würfel wiederholt werden
-
-}
-
-vec3 bisect(vec3 _pos, vec3 _direction, int counter)
-{
-	float step = marchEpsilon*0.5;
-	vec3 pos = _pos-_direction*step;
-
-	for(int i=0; i<counter; i++)
-	{
-		step = step*0.5;
-		if (pos.y <= f(pos.x, pos.z)*5.0)
-			pos = pos - step*_direction;
-		else
-			pos = pos + step*_direction;
-	}
-	return pos;
-}
-
 float distBox(vec3 p, vec3 b)
 {
 	return max(max(abs(p.x)-b.x,abs(p.y)-b.y),abs(p.z)-b.z);
@@ -159,6 +139,7 @@ float distPlane(vec3 p, vec4 n, vec3 pos)
 float distScene(vec3 point)
 {
 	float distanceBox;
+	vec4 boxColorMixed = mix(boxColor, planeColor, boxColorInterpolate);
 	if(iGlobalTime<33.5)
 	{
 		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
@@ -177,7 +158,7 @@ float distScene(vec3 point)
 	}
 
 	float distancePlane = plane(point, vec3(0.0,1.0,0.0), 1.5);
-	globalColor = distanceBox < distancePlane ? boxColor : planeColor;
+	globalColor = distanceBox < distancePlane ? boxColorMixed : planeColor;
 	return distanceBox < distancePlane ? distanceBox : distancePlane;
 }
 
@@ -203,14 +184,6 @@ vec3 getNormal(vec3 point)
 						distScene(up) - distScene(down),
 						distScene(behind) - distScene(before));
 	return normalize(gradient);
-}
-
-vec3 getNormalHf(vec3 p)
-{
-    vec3 n = vec3( f(p.x-epsilon,p.z) - f(p.x+epsilon,p.z),
-                         2.0*epsilon,
-                         f(p.x,p.z-epsilon) - f(p.x,p.z+epsilon) );
-    return normalize( n );
 }
 
 float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
@@ -368,10 +341,10 @@ void main()
 		//}
 
 		//Soft Shadows
-		gl_FragColor = intersect.color+0.2;
+		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,1.0,1.0,1.0), length(intersect.intersectP-camP)/100);
 	}		
 	else
 		//gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
-		gl_FragColor = vec4(1.0,0.42,0.36,0.0);
+		gl_FragColor =  vec4(1.0,0.42,0.36,0.0);
 
 }		
