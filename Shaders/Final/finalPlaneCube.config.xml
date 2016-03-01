@@ -365,8 +365,16 @@
           <Value>39.5</Value>
         </Keyframe>
         <Keyframe>
-          <Time>80</Time>
+          <Time>80.8</Time>
           <Value>42</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>82</Time>
+          <Value>80</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>110</Time>
+          <Value>50</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -468,11 +476,7 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>55.14</Time>
-          <Value>0</Value>
-        </Keyframe>
-        <Keyframe>
-          <Time>56.0459938</Time>
+          <Time>56.8</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
@@ -930,11 +934,11 @@
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>83.19771</Time>
+          <Time>84.58</Time>
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>87.6189957</Time>
+          <Time>92.23</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
@@ -1038,6 +1042,47 @@
         </Keyframe>
       </Keyframes>
     </Uniform>
+    <Uniform>
+      <UniformName>boxColorEndInterpolate</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>56.8</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>71.94</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>75.09</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>82.01</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>83.71</Time>
+          <Value>0.95</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>85.15</Time>
+          <Value>0.9</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>89.63</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>1</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
   </Uniforms>
   <Tracks>
     <Track>
@@ -1056,7 +1101,7 @@
           <ShaderPath>.\FinalUniverse.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>101.854477</Time>
+          <Time>99.7233047</Time>
           <ShaderPath>.\FinalEnding.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

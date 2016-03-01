@@ -110,9 +110,6 @@ vec3 opTx( vec3 p, mat4 m )
 float distBox(vec3 p, vec3 b)
 {
 	return max(max(abs(p.x)-b.x,abs(p.y)-b.y),abs(p.z)-b.z);
-  /*vec3 d = abs(p) - b;
-  return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));*/
 }
 
 float distBox2(vec3 p, vec3 b, vec3 m)
@@ -297,8 +294,8 @@ void main()
 
 	vec3 areaLightPos = vec3(0.0,10.0,-10.0);
 
-	vec3 dirLightPos = vec3(4.0,10.0,4.0);
-	vec3 lightDirection = normalize(vec3(-1.0,1.0,1.0));
+	vec3 dirLightPos = vec3(0.0,10.0,-10.0);
+	vec3 lightDirection = normalize(vec3(-1.0,1.0,-1.0));
 
 	//vec4 lightColor2 = vec4(1.0, 0.3, 0.3, 1.0);
 
@@ -322,7 +319,6 @@ void main()
 		{
 			intersect.color += vec4(1.0,0.3,0.3,1.0)*0.1;
 			//intersect.color = mix(intersect.color, vec4(1.0,0.3,0.3,1.0), 0.3);
-
 		}
 
 		float lightIntensity1 = max(0.4*(2.0-distance(intersect.intersectP, holePosAbove)),0.0);

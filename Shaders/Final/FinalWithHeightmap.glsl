@@ -19,6 +19,7 @@ uniform float camPosMove;
 uniform float lookAtY;
 
 uniform float boxColorInterpolate;
+uniform float boxColorEndInterpolate;
 
 uniform float cubeHeightDiv;
 uniform float heightmapHeight;
@@ -30,6 +31,7 @@ float time=iGlobalTime;
 int textureSize = 100;
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.31,0.439,0.812,1.0);
+vec4 boxColorEnd = vec4(0.15,0.87,0.77,1.0);
 vec4 planeColor = vec4(0.31,0.439,0.812,1.0);
 float shadowK = 24.0;
 
@@ -169,7 +171,7 @@ float distScene(vec3 point)
 		vec3(0.5),vec3(15.3,boxPosY,14.15)); //		vec3(0.5),vec3(4.5,boxPosY,4.5)); 
 	//float distancePlane = distPlane(point, vec4(0.0,1.0,0.0,1.0), vec3(0.0,2.5,0.0));
 	//globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-	globalColor = boxColor;
+	globalColor = distanceBox < distanceHill ? mix(boxColor, boxColorEnd, boxColorEndInterpolate) : boxColor;
 
 	//globalColor = planeColor;
 	return min(distanceHill, distanceBox);
@@ -221,7 +223,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	intersect.exists = false;
 
 	vec3 newPos = origin;
-	newPos += 1.0*direction;
+	newPos += 3.0*direction;
 
 	float height = 0; //TODO; 0 = guter Init wert?
 	float t = 1000;
@@ -312,7 +314,7 @@ void main()
 
 		//Soft Shadows
 		//gl_FragColor = intersect.color+0.2;
-		gl_FragColor = mix(mix(intersect.color+0.2, vec4(1.0), length(intersect.intersectP-camP)/75), vec4(0.0),boxColorInterpolate);
+		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,0.42,0.36,0.0), length(intersect.intersectP-camP)/50);
 
 	}		
 	else

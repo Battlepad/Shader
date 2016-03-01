@@ -141,8 +141,8 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = vec4(0.5,1.0,0.5,1.0);
-            
+            intersect.color = vec4(0.15,0.87,0.77,1.0);
+                        
             intersect.intersectP = newPos;
 
             return intersect;
