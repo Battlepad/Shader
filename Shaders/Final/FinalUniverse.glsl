@@ -2,11 +2,20 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 
+uniform float time;
+
+uniform float toPrism;
+uniform float toCylinder;
+uniform float toTorus;
+uniform float toSphere;
+
+uniform float planetSize;
+
 uniform float boxColorInterpolate;
 uniform float boxColorEndInterpolate;
 
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
-const int maxIterations = 256;
+const int maxIterations = 128;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
 vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
@@ -21,41 +30,6 @@ struct Intersection
     vec3 normal;
     bool exists;
 };
-
-float distBox2(vec3 p, vec3 b, vec3 m)
-{
-    vec3 d = abs(p-m) - b;
-    return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
-}
-
-/*float distBox(vec3 p, vec3 b)
-{
-  vec3 d = abs(p) - b;
-  return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
-}*/
-
-float distBox( in vec3 p, vec3 data )
-{
-    float box = max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
-    float sphere = length(p)-1;
-    return(mix(box, sphere, abs(sin(iGlobalTime))));
-}
-
-float distSphere(vec3 p, vec3 m, float r){
-    return length(p - m) - r;
-}
-
-vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
-{
-    return mod(P,b)-b/2;
-}
-
-vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
-{
-    return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
-}
 
 mat4 rotationMatrix(vec3 axis, float angle)
 {
@@ -78,6 +52,85 @@ mat4 translationMatrix(vec3 delta)
                     0.0,    0.0,    0.0,    1.0     );
 }
 
+float opS( float d1, float d2 )
+{
+    return max(-d1,d2);
+}
+
+float distBox2(vec3 p, vec3 b, vec3 m)
+{
+    vec3 d = abs(p-m) - b;
+    return min(max(d.x,max(d.y,d.z)),0.0) +
+         length(max(d,0.0));
+}
+
+/*float distBox(vec3 p, vec3 b)
+{
+  vec3 d = abs(p) - b;
+  return min(max(d.x,max(d.y,d.z)),0.0) +
+         length(max(d,0.0));
+}*/
+
+float distBox(vec3 p, vec3 data )
+{
+    return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
+    //float sphere = length(p)-0.5;
+    //return(mix(box, sphere, abs(sin(iGlobalTime))));
+}
+
+float distTriPrism( vec3 p, vec2 h )
+{
+    vec3 q = abs(p);
+    return max(q.z-h.y,max(q.x*0.866025+p.y*0.5,-p.y)-h.x*0.5);
+}
+
+float distCylinder( vec3 p, vec2 h )
+{
+  vec2 d = abs(vec2(length(p.xz),p.y)) - h;
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+float distTorus( vec3 p, vec2 t )
+{
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+
+float distSphere(vec3 p, float r)
+{
+    return length(p) - r;
+}
+
+float distPlanet(vec3 p)
+{
+    vec3 spherePos = vec3(0.0,0.0,5.0);
+    vec3 spherePosTmp = vec3(5.0,0.0,45.0);
+    return opS(distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(spherePosTmp), 0.0),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(vec3(15.0,0.0,45.0)), planetSize));
+}
+
+float distForms(vec3 p)
+{
+    float box = distBox(p, vec3(0.5));
+    float triPrism = distTriPrism(p, vec2(0.5));
+    float cylinder = distCylinder(p, vec2(0.5));
+    float torus = distTorus(p, vec2(0.5));
+    float sphere = distSphere(p, 0.5);
+
+    return mix(mix(mix(mix(box, triPrism, toPrism), cylinder, toCylinder), torus, toTorus), sphere, toSphere);
+
+}
+
+vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+{
+    return mod(P,b)-b/2;
+}
+
+vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+{
+    return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
+}
 
 /*float distScene(vec3 point){
     vec3 spherePos = vec3(0.0,0.0,0.0);
@@ -120,12 +173,19 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
-    float distanceBox = distBox(((vec4(point.xyz,1.0)
+    /*float distanceBox = distBox(((vec4(point.xyz,1.0)
             *translationMatrix(boxPos) //translation of cube
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
             vec3(0.5)); 
-    return distanceBox;
+    return distanceBox;*/
+    float distanceForms = distForms(((vec4(point.xyz,1.0)
+            *translationMatrix(boxPos) //translation of cube
+            *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
+            *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
+            ); 
+    float planet = distPlanet(point);
+    return min(distanceForms,planet);
 }
 
 vec3 getNormal(vec3 point)
@@ -306,7 +366,7 @@ void main()
             float angleRnd = floor(angle*360.)+1.;
             float angleRnd1 = fract(angleRnd*fract(angleRnd*.7235)*45.1);
             float angleRnd2 = fract(angleRnd*fract(angleRnd*.82657)*13.724);
-            float t = iGlobalTime*5.0+angleRnd1*100.;
+            float t = time*5.0+angleRnd1*100.;
             float radDist = sqrt(angleRnd2+float(i));
             
             float adist = radDist/rad*.1;

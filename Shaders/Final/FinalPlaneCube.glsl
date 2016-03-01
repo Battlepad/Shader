@@ -5,7 +5,7 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform sampler2D tex;
-uniform float tiltTime;
+uniform float time;
 uniform float tiltX;
 uniform float tiltY;
 uniform float tiltZ;
@@ -24,7 +24,6 @@ uniform float lightIntensityAbove;
 
 varying vec2 uv;
 
-float time=iGlobalTime;
 int textureSize = 100;
 vec3 boxPos = vec3(-5.0,-1.5,boxPosZ);
 vec4 globalColor = vec4(0.0);
@@ -141,7 +140,7 @@ float distScene(vec3 point)
 	{
 		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
 			*translationMatrix(boxPos) //translation of cube
-			*rotationMatrix(vec3(-1.0,0.0,0.0), tiltTime/0.5*(PI/2))) //rotation around z-axis
+			*rotationMatrix(vec3(-1.0,0.0,0.0), time/0.5*(PI/2))) //rotation around z-axis
 			*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
 			vec3(0.5), vec3(0.0,boxPosY,0.0)); 
 	}
@@ -149,7 +148,7 @@ float distScene(vec3 point)
 	{
 		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
 			*translationMatrix(vec3(-5.0,boxPosY,-4.5)) //translation of cube
-			*rotationMatrix(vec3(tiltX,tiltY,tiltZ), tiltTime)) //rotation around z-axis
+			*rotationMatrix(vec3(tiltX,tiltY,tiltZ), time)) //rotation around z-axis
 			*translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
 			vec3(0.5), vec3(0.0,0.0,0.0)); 
 	}

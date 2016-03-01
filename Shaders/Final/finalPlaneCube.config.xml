@@ -2,7 +2,7 @@
 <DemoData2 xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Uniforms>
     <Uniform>
-      <UniformName>tiltTime</UniformName>
+      <UniformName>time</UniformName>
       <Keyframes>
         <Keyframe>
           <Time>0</Time>
@@ -97,8 +97,28 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>52.5366478</Time>
+          <Time>56.19</Time>
           <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>82.91777</Time>
+          <Value>2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>93.39</Time>
+          <Value>18</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>96.85</Time>
+          <Value>20</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>99.65</Time>
+          <Value>22</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>125</Time>
+          <Value>22</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1083,6 +1103,131 @@
         </Keyframe>
       </Keyframes>
     </Uniform>
+    <Uniform>
+      <UniformName>toPrism</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>88.4</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>89.62</Time>
+          <Value>0.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>90.72051</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>1</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>toCylinder</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>90.72051</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>91.94</Time>
+          <Value>0.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>93.07166</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>1</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>toTorus</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>93.07166</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>94.3</Time>
+          <Value>0.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>95.43722</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>0</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>toSphere</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>95.43722</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>97</Time>
+          <Value>0.3</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>97.8042</Time>
+          <Value>1</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>0</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>planetSize</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>91.75</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>93.36914</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>99.49962</Time>
+          <Value>10</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>10</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
   </Uniforms>
   <Tracks>
     <Track>
@@ -1101,7 +1246,7 @@
           <ShaderPath>.\FinalUniverse.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>99.7233047</Time>
+          <Time>101.465057</Time>
           <ShaderPath>.\FinalEnding.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

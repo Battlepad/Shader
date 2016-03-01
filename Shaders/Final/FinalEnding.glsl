@@ -2,6 +2,8 @@ uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 
+uniform float time;
+
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
@@ -142,7 +144,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.normal = getNormal(newPos);
 
             intersect.color = vec4(0.15,0.87,0.77,1.0);
-                        
+
             intersect.intersectP = newPos;
 
             return intersect;
@@ -283,7 +285,7 @@ void main()
             float angleRnd = floor(angle*360.)+1.;
             float angleRnd1 = fract(angleRnd*fract(angleRnd*.7235)*45.1);
             float angleRnd2 = fract(angleRnd*fract(angleRnd*.82657)*13.724);
-            float t = iGlobalTime*5.0+angleRnd1*100.;
+            float t = time*5.0+angleRnd1*100.;
             float radDist = sqrt(angleRnd2+float(i));
             
             float adist = radDist/rad*.1;
