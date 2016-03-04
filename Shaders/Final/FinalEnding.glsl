@@ -1,3 +1,5 @@
+#define PI 3.1459
+
 uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
@@ -6,6 +8,8 @@ uniform float time;
 
 uniform float planetSize;
 uniform float planetPosX;
+uniform float boxPosX;
+uniform float boxPosZ;
 
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
@@ -51,6 +55,11 @@ float distSphere(vec3 p, float r)
     return length(p) - r;
 }
 
+float distSphere2(vec3 p, float r, vec3 m)
+{
+    return length(p-m) - r;
+}
+
 float distBox( in vec3 p, vec3 data )
 {
     return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
@@ -63,10 +72,10 @@ float opS( float d1, float d2 )
 
 float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
 {
-    vec3 spherePos = vec3(0.0,0.0,5.0);
+    vec3 spherePos = vec3(10.0,0.0,5.0);
     vec3 spherePosTmp = vec3(5.0,0.0,45.0);
     return opS(distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(sphPos), 0.0),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(sphPos),0.5),distSphere(vec4(p.xyz,1.0)
         *translationMatrix(plPos), planetSize));
 }
 
@@ -112,15 +121,45 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
+    float distanceSphere;
+    float planetPosZ = 20.0;
+    vec3 planetPos = vec3(planetPosX,0.0,planetPosZ);
 
-    float distanceSphere = distSphere(point, 0.25);
+    if(iGlobalTime<108.42)
+    {
+        distanceSphere = distSphere((vec4(point.xyz,1.0)*translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, 0.25);
+    }
+    else
+    {
+        distanceSphere = distSphere2(((vec4(point.x,point.y,point.z,1.0)
+            *translationMatrix(planetPos) //translation of cube
+            *rotationMatrix(vec3(0.0,1.0,0.0), -iGlobalTime/2+108.42/2+PI)) //rotation around z-axis
+            *translationMatrix(vec3(planetSize+1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            0.25, vec3(0.0,0.0,0.0));  
+    }
+
+
+
+    /*float distanceBox = distSphere(((vec4(point.x,point.y,point.z,1.0)
+            *translationMatrix(vec3(0.0)) //translation of cube
+            *rotationMatrix(vec3(0.0,1.0,0.0), time)) //rotation around z-axis
+            *translationMatrix(vec3(planetPosX,0.0,45.0))).xyz, //translation, so cube rotates around edge 
+            0.25);  */
+      float distanceBox = distSphere2(((vec4(point.x,point.y,point.z,1.0)
+            *translationMatrix(planetPos) //translation of cube
+            *rotationMatrix(vec3(0.0,1.0,0.0), PI)) //rotation around z-axis
+            *translationMatrix(vec3(planetSize+1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            0.25, vec3(0.0,0.0,0.0));  
+
     //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
 
-    float distancePlanet = distPlanet(point, vec3(0.0,0.0,5.0), vec3(planetPosX,0.0,45.0));
+    float distancePlanet = distPlanet(point, vec3(planetPosX-planetSize+1.0,0.0,planetPosZ-4.0), planetPos);
     //(vec4(point.xyz,1.0)*translationMatrix(0.0,0.0,5.0)).xyz
              //translation of cube
     globalColor = distanceSphere < distancePlanet ? sphereColor : planetColor;
     return min(distanceSphere,distancePlanet);
+    //return distanceBox;
+
 }
 
 vec3 getNormal(vec3 point)
@@ -303,6 +342,7 @@ void main()
             float angleRnd = floor(angle*360.)+1.;
             float angleRnd1 = fract(angleRnd*fract(angleRnd*.7235)*45.1);
             float angleRnd2 = fract(angleRnd*fract(angleRnd*.82657)*13.724);
+            //float t = time*5.0+angleRnd1*100.;
             float t = time*5.0+angleRnd1*100.;
             float radDist = sqrt(angleRnd2+float(i));
             

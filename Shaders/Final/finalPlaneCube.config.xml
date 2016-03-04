@@ -110,31 +110,31 @@
         </Keyframe>
         <Keyframe>
           <Time>93.97</Time>
-          <Value>18.5372314</Value>
+          <Value>18.53723</Value>
         </Keyframe>
         <Keyframe>
           <Time>94.5</Time>
-          <Value>18.8872662</Value>
+          <Value>18.88727</Value>
         </Keyframe>
         <Keyframe>
           <Time>95.1</Time>
-          <Value>19.2188778</Value>
+          <Value>19.21888</Value>
         </Keyframe>
         <Keyframe>
           <Time>95.63</Time>
-          <Value>19.5197849</Value>
+          <Value>19.51978</Value>
         </Keyframe>
         <Keyframe>
           <Time>96.2</Time>
-          <Value>19.7899876</Value>
+          <Value>19.78999</Value>
         </Keyframe>
         <Keyframe>
           <Time>96.85</Time>
-          <Value>20.127739</Value>
+          <Value>20.12774</Value>
         </Keyframe>
         <Keyframe>
           <Time>97.52</Time>
-          <Value>20.4654922</Value>
+          <Value>20.46549</Value>
         </Keyframe>
         <Keyframe>
           <Time>98.16</Time>
@@ -142,19 +142,19 @@
         </Keyframe>
         <Keyframe>
           <Time>98.8</Time>
-          <Value>21.0488834</Value>
+          <Value>21.04888</Value>
         </Keyframe>
         <Keyframe>
           <Time>99.48</Time>
-          <Value>21.3313675</Value>
+          <Value>21.33137</Value>
         </Keyframe>
         <Keyframe>
           <Time>100.2</Time>
-          <Value>21.6077118</Value>
+          <Value>21.60771</Value>
         </Keyframe>
         <Keyframe>
           <Time>100.95</Time>
-          <Value>21.8349266</Value>
+          <Value>21.83493</Value>
         </Keyframe>
         <Keyframe>
           <Time>101.86</Time>
@@ -362,6 +362,22 @@
         <Keyframe>
           <Time>44</Time>
           <Value>-4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>45</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>102.21</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>108.42</Time>
+          <Value>20</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>20</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1298,7 +1314,7 @@
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>0</Value>
+          <Value>1</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1310,20 +1326,20 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>95.43722</Time>
+          <Time>95.33722</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>97</Time>
+          <Time>96.9</Time>
           <Value>0.3</Value>
         </Keyframe>
         <Keyframe>
-          <Time>97.8042</Time>
+          <Time>97.7042</Time>
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>0</Value>
+          <Value>1</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1344,11 +1360,11 @@
         </Keyframe>
         <Keyframe>
           <Time>101.762726</Time>
-          <Value>10</Value>
+          <Value>7</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>10</Value>
+          <Value>7</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1365,11 +1381,32 @@
         </Keyframe>
         <Keyframe>
           <Time>101.762726</Time>
-          <Value>15</Value>
+          <Value>12</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>15</Value>
+          <Value>12</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>boxPosX</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>102.21</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>108.42</Time>
+          <Value>4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>4</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>

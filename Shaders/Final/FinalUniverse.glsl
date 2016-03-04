@@ -105,10 +105,8 @@ float distSphere(vec3 p, float r)
 
 float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
 {
-    vec3 spherePos = vec3(0.0,0.0,5.0);
-    vec3 spherePosTmp = vec3(5.0,0.0,45.0);
     return opS(distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(sphPos), 0.0),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(sphPos), 0.5/(7.0/planetSize)),distSphere(vec4(p.xyz,1.0)
         *translationMatrix(plPos), planetSize));
 }
 
@@ -175,6 +173,9 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
+    float planetPosZ = 20.0;
+    vec3 planetPos = vec3(planetPosX,0.0,20.0);
+
     /*float distanceBox = distBox(((vec4(point.xyz,1.0)
             *translationMatrix(boxPos) //translation of cube
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
@@ -186,7 +187,7 @@ float distScene(vec3 point)
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
             ); 
-    float distancePlanet = distPlanet(point, vec3(0.0,0.0,5.0), vec3(planetPosX,0.0,45.0));
+    float distancePlanet = distPlanet(point, vec3(planetPosX-planetSize+1.0,0.0,planetPosZ-4.0/(12.0/planetPosX)), planetPos);
     globalColor = distanceForms < distancePlanet ? boxColor : planetColor;
     return min(distanceForms,distancePlanet);
 }
