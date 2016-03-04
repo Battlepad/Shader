@@ -109,11 +109,55 @@
           <Value>18</Value>
         </Keyframe>
         <Keyframe>
-          <Time>96.85</Time>
-          <Value>20</Value>
+          <Time>93.97</Time>
+          <Value>18.5372314</Value>
         </Keyframe>
         <Keyframe>
-          <Time>99.65</Time>
+          <Time>94.5</Time>
+          <Value>18.8872662</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>95.1</Time>
+          <Value>19.2188778</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>95.63</Time>
+          <Value>19.5197849</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>96.2</Time>
+          <Value>19.7899876</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>96.85</Time>
+          <Value>20.127739</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>97.52</Time>
+          <Value>20.4654922</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>98.16</Time>
+          <Value>20.7664</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>98.8</Time>
+          <Value>21.0488834</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>99.48</Time>
+          <Value>21.3313675</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>100.2</Time>
+          <Value>21.6077118</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>100.95</Time>
+          <Value>21.8349266</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>101.86</Time>
           <Value>22</Value>
         </Keyframe>
         <Keyframe>
@@ -353,8 +397,88 @@
           <Value>-2</Value>
         </Keyframe>
         <Keyframe>
-          <Time>41.87</Time>
+          <Time>34.43</Time>
+          <Value>-2.70071864</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>35.15</Time>
+          <Value>-3.145453</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>36.07</Time>
+          <Value>-3.61359453</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>37.07</Time>
+          <Value>-4.011515</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>38.14</Time>
+          <Value>-4.339214</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>39.18</Time>
+          <Value>-4.65618</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>40.17</Time>
+          <Value>-4.91059971</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>40.96</Time>
           <Value>-5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>41.74</Time>
+          <Value>-4.95251</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>42.56</Time>
+          <Value>-4.82043171</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>43.32</Time>
+          <Value>-4.630348</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>43.92</Time>
+          <Value>-4.48413</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>44.56</Time>
+          <Value>-4.32329035</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>45.11</Time>
+          <Value>-4.118585</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>45.7</Time>
+          <Value>-3.91387963</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>46.33</Time>
+          <Value>-3.62144351</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>46.92</Time>
+          <Value>-3.29976368</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>47.53</Time>
+          <Value>-2.84648776</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>48.06</Time>
+          <Value>-2.37858987</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>48.59</Time>
+          <Value>-2</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>50.13</Time>
+          <Value>-1.6467123</Value>
         </Keyframe>
         <Keyframe>
           <Time>51.81</Time>
@@ -938,15 +1062,15 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>55.88</Time>
+          <Time>55.971</Time>
           <Value>1</Value>
         </Keyframe>
         <Keyframe>
-          <Time>55.9510231</Time>
+          <Time>55.97102</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>76.6506653</Time>
+          <Time>76.65067</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
@@ -1099,7 +1223,7 @@
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>1</Value>
+          <Value>0</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1211,20 +1335,41 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>91.75</Time>
+          <Time>87.34</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>93.36914</Time>
+          <Time>93.7182541</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>99.49962</Time>
+          <Time>101.762726</Time>
           <Value>10</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
           <Value>10</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>planetPosX</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>93.7182541</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>101.762726</Time>
+          <Value>15</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>15</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1246,7 +1391,7 @@
           <ShaderPath>.\FinalUniverse.glsl</ShaderPath>
         </ShaderKeyframe>
         <ShaderKeyframe>
-          <Time>101.465057</Time>
+          <Time>102.034943</Time>
           <ShaderPath>.\FinalEnding.glsl</ShaderPath>
         </ShaderKeyframe>
       </ShaderKeyframes>

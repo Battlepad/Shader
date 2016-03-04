@@ -10,6 +10,7 @@ uniform float toTorus;
 uniform float toSphere;
 
 uniform float planetSize;
+uniform float planetPosX;
 
 uniform float boxColorInterpolate;
 uniform float boxColorEndInterpolate;
@@ -18,8 +19,9 @@ const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 128;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
+vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
-
+vec4 planetColor = vec4(1.0,0.42,0.36,0.0);
 
 //const vec3 boxPos = vec3(0.0,0.0,10.0);
 
@@ -101,13 +103,13 @@ float distSphere(vec3 p, float r)
     return length(p) - r;
 }
 
-float distPlanet(vec3 p)
+float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
 {
     vec3 spherePos = vec3(0.0,0.0,5.0);
     vec3 spherePosTmp = vec3(5.0,0.0,45.0);
     return opS(distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(spherePosTmp), 0.0),distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(vec3(15.0,0.0,45.0)), planetSize));
+        *translationMatrix(sphPos), 0.0),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(plPos), planetSize));
 }
 
 float distForms(vec3 p)
@@ -154,9 +156,9 @@ float distSceneReflection(vec3 point)
 
         //vec3 boxPos = vec3(0.0,0.0,10.0);
 
-    float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-iGlobalTime*2))).xyz, b1),
+    float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-time))).xyz, b1),
         vec3(0.1,0.1,0.1));
-    float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-iGlobalTime,iGlobalTime*3,0.0))).xyz, b2),
+    float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-time,time,0.0))).xyz, b2),
         vec3(0.1,0.1,0.1));
     return min(d1,d2);
     //return distanceBox;
@@ -184,8 +186,9 @@ float distScene(vec3 point)
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
             ); 
-    float planet = distPlanet(point);
-    return min(distanceForms,planet);
+    float distancePlanet = distPlanet(point, vec3(0.0,0.0,5.0), vec3(planetPosX,0.0,45.0));
+    globalColor = distanceForms < distancePlanet ? boxColor : planetColor;
+    return min(distanceForms,distancePlanet);
 }
 
 vec3 getNormal(vec3 point)
@@ -225,7 +228,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = boxColor;
+            intersect.color = globalColor;
             
             intersect.intersectP = newPos;
 

@@ -4,9 +4,16 @@ uniform float iGlobalTime;
 
 uniform float time;
 
+uniform float planetSize;
+uniform float planetPosX;
+
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
+
+vec4 globalColor = vec4(0.0);
+vec4 sphereColor = vec4(0.15,0.87,0.77,1.0);
+vec4 planetColor = vec4(1.0,0.42,0.36,0.0);
 
 //const vec3 boxPos = vec3(0.0,0.0,10.0);
 
@@ -17,30 +24,6 @@ struct Intersection
     vec3 normal;
     bool exists;
 };
-
-float distSphere(vec3 p, vec3 m, float r){
-    return length(p - m) - r;
-}
-
-float distBox( in vec3 p, vec3 data )
-{
-    return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
-}
-
-float opS( float d1, float d2 )
-{
-    return max(-d1,d2);
-}
-
-vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
-{
-    return mod(P,b)-b/2;
-}
-
-vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
-{
-    return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
-}
 
 mat4 rotationMatrix(vec3 axis, float angle)
 {
@@ -63,6 +46,40 @@ mat4 translationMatrix(vec3 delta)
                     0.0,    0.0,    0.0,    1.0     );
 }
 
+float distSphere(vec3 p, float r)
+{
+    return length(p) - r;
+}
+
+float distBox( in vec3 p, vec3 data )
+{
+    return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
+}
+
+float opS( float d1, float d2 )
+{
+    return max(-d1,d2);
+}
+
+float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
+{
+    vec3 spherePos = vec3(0.0,0.0,5.0);
+    vec3 spherePosTmp = vec3(5.0,0.0,45.0);
+    return opS(distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(sphPos), 0.0),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(plPos), planetSize));
+}
+
+vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+{
+    return mod(P,b)-b/2;
+}
+
+vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+{
+    return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
+}
+
 float distSceneReflection(vec3 point)
 {
     //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
@@ -76,9 +93,9 @@ float distSceneReflection(vec3 point)
 
         //vec3 boxPos = vec3(0.0,0.0,10.0);
 
-    float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-iGlobalTime))).xyz, b1),
+    float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-time))).xyz, b1),
         vec3(0.1,0.1,0.1));
-    float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-iGlobalTime,iGlobalTime,0.0))).xyz, b2),
+    float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-time,time,0.0))).xyz, b2),
         vec3(0.1,0.1,0.1));
     return min(d1,d2);
     //return distanceBox;
@@ -95,14 +112,14 @@ float distScene(vec3 point)
     //globalColor = boxColor;
 
     //globalColor = planeColor;
-    vec3 spherePos = vec3(0.0,0.0,5.0);
-    vec3 spherePosTmp = vec3(5.0,0.0,45.0);
-    float distanceSphere = distSphere(vec4(point.xyz,1.0)*translationMatrix(spherePos), vec3(0.0), 0.5);
+
+    float distanceSphere = distSphere(point, 0.25);
     //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
 
-    float distancePlanet = opS(distSphere(vec4(point.xyz,1.0)*translationMatrix(spherePosTmp), vec3(0.0), 10.0),distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10));
+    float distancePlanet = distPlanet(point, vec3(0.0,0.0,5.0), vec3(planetPosX,0.0,45.0));
     //(vec4(point.xyz,1.0)*translationMatrix(0.0,0.0,5.0)).xyz
              //translation of cube
+    globalColor = distanceSphere < distancePlanet ? sphereColor : planetColor;
     return min(distanceSphere,distancePlanet);
 }
 
@@ -143,7 +160,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = vec4(0.15,0.87,0.77,1.0);
+            intersect.color = globalColor;
 
             intersect.intersectP = newPos;
 
@@ -178,7 +195,7 @@ Intersection rayMarchReflect(vec3 origin, vec3 direction)
             intersect.exists = true;
             intersect.normal = getNormal(newPos);
 
-            intersect.color = vec4(1.0,i/maxIterations,0.5,1.0);
+            intersect.color = vec4(1.0,1.0,1.0,1.0);
             
             intersect.intersectP = newPos;
 
@@ -240,7 +257,7 @@ void main()
     //camDir = (lookAt(camP, vec3(boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
     camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
-    vec3 areaLightPos = vec3(0.0,10.0,-10.0);
+    vec3 areaLightPos = vec3(0.0,-10.0,10.0);
 
     //vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
     //vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
@@ -251,14 +268,15 @@ void main()
 
     if(intersect.exists)
     {
+        float lighting = max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
         Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
         if(distance(reflectionIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionIntersect.intersectP, intersect.intersectP) < 75)
         {
-            gl_FragColor = intersect.color+reflectionIntersect.color;
+            gl_FragColor = (intersect.color+reflectionIntersect.color)*lighting*1.2;
         }
         else
         {
-            gl_FragColor = intersect.color;
+            gl_FragColor = intersect.color*lighting;
 
         }
 
