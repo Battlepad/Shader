@@ -5,11 +5,14 @@ uniform vec2 iResolution;
 uniform float iGlobalTime;
 
 uniform float time;
+uniform float sphereMoveTime;
 
 uniform float planetSize;
 uniform float planetPosX;
 uniform float boxPosX;
 uniform float boxPosZ;
+uniform float camPosX;
+uniform float camPosZ;
 
 const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
@@ -75,7 +78,7 @@ float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
     vec3 spherePos = vec3(10.0,0.0,5.0);
     vec3 spherePosTmp = vec3(5.0,0.0,45.0);
     return opS(distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(sphPos),0.5),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(sphPos),0.25),distSphere(vec4(p.xyz,1.0)
         *translationMatrix(plPos), planetSize));
 }
 
@@ -129,12 +132,22 @@ float distScene(vec3 point)
     {
         distanceSphere = distSphere((vec4(point.xyz,1.0)*translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, 0.25);
     }
+    else if(iGlobalTime < 122.0971)
+    {
+        distanceSphere = distSphere2(((vec4(point.x,point.y,point.z,1.0)
+            *translationMatrix(planetPos) //translation of cube
+            *rotationMatrix(vec3(0.0,1.0,0.0), sphereMoveTime/2-108.42/2-PI)) //iGlobalTime/2-108.42/2 is one at starting point of the else, 
+                                                                            //-PI, so it starts at the right side//rotation around z-axis
+            *translationMatrix(vec3(-planetSize-1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            0.25, vec3(0.0,0.0,0.0));  
+    }
     else
     {
         distanceSphere = distSphere2(((vec4(point.x,point.y,point.z,1.0)
             *translationMatrix(planetPos) //translation of cube
-            *rotationMatrix(vec3(0.0,1.0,0.0), -iGlobalTime/2+108.42/2+PI)) //rotation around z-axis
-            *translationMatrix(vec3(planetSize+1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            *rotationMatrix(vec3(0.0,1.0,0.0), 118.9395/2-108.42/2-PI)) //iGlobalTime/2-108.42/2 is one at starting point of the else, 
+                                                                            //-PI, so it starts at the right side//rotation around z-axis
+            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation, so cube rotates around edge 
             0.25, vec3(0.0,0.0,0.0));  
     }
 
@@ -153,7 +166,7 @@ float distScene(vec3 point)
 
     //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
 
-    float distancePlanet = distPlanet(point, vec3(planetPosX-planetSize+1.0,0.0,planetPosZ-4.0), planetPos);
+    float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-0.98,0.0,planetPosZ+3.76/(12.0/planetPosX)), planetPos);
     //(vec4(point.xyz,1.0)*translationMatrix(0.0,0.0,5.0)).xyz
              //translation of cube
     globalColor = distanceSphere < distancePlanet ? sphereColor : planetColor;
@@ -290,11 +303,13 @@ void main()
     float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-    vec3 camP = vec4(0, 0, 5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
+    vec3 camP = vec4(camPosX,0.0,camPosZ,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
+        //vec3 camP = vec4(0.0,0.0,5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
+
     //vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
-    vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
+    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));//TODO: wieder zu -1.0 machen!
     //camDir = (lookAt(camP, vec3(boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
-    camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+    //camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
     vec3 areaLightPos = vec3(0.0,-10.0,10.0);
 
@@ -308,15 +323,20 @@ void main()
     if(intersect.exists)
     {
         float lighting = max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
-        Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
-        if(distance(reflectionIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionIntersect.intersectP, intersect.intersectP) < 75)
+        Intersection reflectionStarsIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+        Intersection reflectionSpheresIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+
+        if(distance(reflectionStarsIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionStarsIntersect.intersectP, intersect.intersectP) < 75)
         {
-            gl_FragColor = (intersect.color+reflectionIntersect.color)*lighting*1.2;
+            gl_FragColor = (intersect.color+reflectionStarsIntersect.color)*lighting*1.2;
         }
         else
         {
             gl_FragColor = intersect.color*lighting;
-
+        }
+        if(reflectionSpheresIntersect.exists)
+        {
+            gl_FragColor = gl_FragColor+reflectionSpheresIntersect.color*0.7;
         }
 
 //        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);

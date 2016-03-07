@@ -187,7 +187,7 @@ float distScene(vec3 point)
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
             ); 
-    float distancePlanet = distPlanet(point, vec3(planetPosX-planetSize+1.0,0.0,planetPosZ-4.0/(12.0/planetPosX)), planetPos);
+    float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-1.0,0.0,planetPosZ+4.0/(12.0/planetPosX)), planetPos);
     globalColor = distanceForms < distancePlanet ? boxColor : planetColor;
     return min(distanceForms,distancePlanet);
 }
@@ -321,8 +321,8 @@ void main()
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
     vec3 camP = vec4(0, 0, 5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
-    vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
-    camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));//TODO: wieder zu -1.0 machen!
+    //camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
     vec3 areaLightPos = vec3(0.0,-10.0,10.0);
 
@@ -336,15 +336,20 @@ void main()
     if(intersect.exists)
     {
         float lighting = max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
-        Intersection reflectionIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
-        if(distance(reflectionIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionIntersect.intersectP, intersect.intersectP) < 75)
+        Intersection reflectionStarsIntersect = rayMarchReflect(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+        Intersection reflectionSpheresIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
+
+        if(distance(reflectionStarsIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionStarsIntersect.intersectP, intersect.intersectP) < 75)
         {
-            gl_FragColor = mix((intersect.color+reflectionIntersect.color)*lighting*1.2, vec4(0.0), boxColorEndInterpolate);
+            gl_FragColor = mix((intersect.color+reflectionStarsIntersect.color)*lighting*1.2, vec4(0.0), boxColorEndInterpolate);
         }
         else
         {
             gl_FragColor = mix(intersect.color*lighting, vec4(0.0), boxColorEndInterpolate);
-
+        }
+        if(reflectionSpheresIntersect.exists)
+        {
+            gl_FragColor = gl_FragColor+reflectionSpheresIntersect.color*0.7;
         }
 
 //        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);

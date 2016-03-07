@@ -368,7 +368,7 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>102.21</Time>
+          <Time>102.01</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
@@ -376,8 +376,16 @@
           <Value>20</Value>
         </Keyframe>
         <Keyframe>
+          <Time>122.0971</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>126.082077</Time>
+          <Value>-3.1</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>129.933</Time>
-          <Value>20</Value>
+          <Value>-3.1</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -967,7 +975,7 @@
           <Value>15</Value>
         </Keyframe>
         <Keyframe>
-          <Time>22.9914379</Time>
+          <Time>22.99144</Time>
           <Value>14</Value>
         </Keyframe>
         <Keyframe>
@@ -987,8 +995,28 @@
           <Value>3</Value>
         </Keyframe>
         <Keyframe>
+          <Time>86.53</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>102.21</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>108</Time>
+          <Value>5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>108.942764</Time>
+          <Value>5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>116.444191</Time>
+          <Value>3.7</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>129.933</Time>
-          <Value>3</Value>
+          <Value>0</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1197,8 +1225,24 @@
           <Value>-1.9</Value>
         </Keyframe>
         <Keyframe>
+          <Time>99.98</Time>
+          <Value>5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>102.21</Time>
+          <Value>5</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>108</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>116.444191</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>129.933</Time>
-          <Value>-1.9</Value>
+          <Value>-5</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1381,11 +1425,11 @@
         </Keyframe>
         <Keyframe>
           <Time>101.762726</Time>
-          <Value>12</Value>
+          <Value>-12</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>12</Value>
+          <Value>-12</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1397,16 +1441,45 @@
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
-          <Time>102.21</Time>
+          <Time>102.01</Time>
           <Value>0</Value>
         </Keyframe>
         <Keyframe>
           <Time>108.42</Time>
-          <Value>4</Value>
+          <Value>-4</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>122.0971</Time>
+          <Value>-8</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>126.082077</Time>
+          <Value>-7</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>4</Value>
+          <Value>-7</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>sphereMoveTime</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>0</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>115.543488</Time>
+          <Value>115.543488</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>122.097122</Time>
+          <Value>118.939522</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>123</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
