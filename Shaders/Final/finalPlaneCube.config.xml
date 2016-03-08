@@ -1357,6 +1357,10 @@
           <Value>-0.9</Value>
         </Keyframe>
         <Keyframe>
+          <Time>63.67</Time>
+          <Value>-0.9</Value>
+        </Keyframe>
+        <Keyframe>
           <Time>73.45</Time>
           <Value>-0.9</Value>
         </Keyframe>
@@ -1668,11 +1672,11 @@
         </Keyframe>
         <Keyframe>
           <Time>65.18</Time>
-          <Value>1000</Value>
+          <Value>500</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>1000</Value>
+          <Value>500</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>
@@ -1689,11 +1693,36 @@
         </Keyframe>
         <Keyframe>
           <Time>65.18</Time>
-          <Value>0.01</Value>
+          <Value>0.001</Value>
         </Keyframe>
         <Keyframe>
           <Time>129.933</Time>
-          <Value>0.01</Value>
+          <Value>0.001</Value>
+        </Keyframe>
+      </Keyframes>
+    </Uniform>
+    <Uniform>
+      <UniformName>fogDistance</UniformName>
+      <Keyframes>
+        <Keyframe>
+          <Time>0</Time>
+          <Value>200</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>56.67</Time>
+          <Value>200</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>62</Time>
+          <Value>20</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>65.33</Time>
+          <Value>20</Value>
+        </Keyframe>
+        <Keyframe>
+          <Time>129.933</Time>
+          <Value>200</Value>
         </Keyframe>
       </Keyframes>
     </Uniform>

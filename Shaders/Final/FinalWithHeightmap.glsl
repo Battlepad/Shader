@@ -28,6 +28,8 @@ uniform float cubeHeightDiv;
 uniform float heightmapHeight;
 uniform float boxHeight;
 
+uniform float fogDistance;
+
 varying vec2 uv;
 
 float time=iGlobalTime;
@@ -222,44 +224,71 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	intersect.exists = false;
 
 	vec3 newPos = origin;
-	newPos += 3.0*direction;
+	newPos += 1.0*direction;
 
 	float height = 0; //TODO; 0 = guter Init wert?
 	float t = 1000;
 
-	for(int i = 0; i <= maxIterations; i++)
+	if(iGlobalTime < 65.18)
 	{
-		t = distScene(newPos);
-		height = f(newPos.x, newPos.z);
 
-		if(t < epsilon)
+		for(int i = 0; i <= maxIterations; i++)
 		{
-			intersect.exists = true;
-			intersect.normal = getNormal(newPos);
+			t = distScene(newPos);
+			height = f(newPos.x, newPos.z);
 
-			intersect.color = globalColor;
-			
-			intersect.intersectP = newPos;
+			if(t < epsilon)
+			{
+				intersect.exists = true;
+				intersect.normal = getNormal(newPos);
 
-			return intersect;
+				intersect.color = globalColor;
+				
+				intersect.intersectP = newPos;
+
+				return intersect;
+			}
+			else if(newPos.y <= height)
+			{
+				newPos = bisect(newPos, direction, 0.0); //TODO: raushauen?
+
+				intersect.exists = true;
+				intersect.normal = getNormalHf(newPos);
+				
+				globalColor = planeColor;
+				intersect.color = globalColor;
+				
+				intersect.intersectP = newPos;
+
+				return intersect;
+			}
+			else
+			{
+				newPos += epsilon*direction;
+			}
 		}
-		else if(newPos.y <= height)
+	}
+	else
+	{
+		for(int i = 0; i <= maxIterations; i++)
 		{
-			newPos = bisect(newPos, direction, 0.0); //TODO: raushauen?
+			t = distScene(newPos);
 
-			intersect.exists = true;
-			intersect.normal = getNormalHf(newPos);
-			
-			globalColor = planeColor;
-			intersect.color = globalColor;
-			
-			intersect.intersectP = newPos;
+			if(t < epsilon)
+			{
+					intersect.exists = true;
+					intersect.normal = getNormal(newPos);
 
-			return intersect;
-		}
-		else
-		{
-			newPos += epsilon*direction;
+					intersect.color = globalColor;
+					
+					intersect.intersectP = newPos;
+
+					return intersect;
+			}
+			else
+			{
+					newPos += t*direction;
+			}
 		}
 	}
 	intersect.intersectP = newPos;
@@ -290,8 +319,10 @@ void main()
 	if(intersect.exists)
 	{
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
-		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,0.42,0.36,0.0), length(intersect.intersectP-camP)/200);
+		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,0.42,0.36,0.0), length(intersect.intersectP-camP)/fogDistance);
 	}		
 	else
-		gl_FragColor =  mix(mix(vec4(1.0,0.42,0.36,0.0), vec4(1.0,1.0,1.0,1.0), length(intersect.intersectP-camP)/200), vec4(0.0), boxColorInterpolate);
+		//gl_FragColor =  mix(mix(vec4(1.0,0.42,0.36,0.0), vec4(1.0,1.0,1.0,1.0), length(intersect.intersectP-camP)/), vec4(0.0), boxColorInterpolate);
+				gl_FragColor =  mix(vec4(1.0,0.42,0.36,0.0), vec4(0.0), boxColorInterpolate);
+
 }		
