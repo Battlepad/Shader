@@ -118,18 +118,14 @@ float distBox2(vec3 p, vec3 b, vec3 m)
          length(max(d,0.0));
 }
 
-float plane(vec3 point, vec3 normal, float d) {
-    //return max(-distBox2(vec3(point.x, point.y+sin(point.z - iGlobalTime * 6.0) * cos(point.x - iGlobalTime) * .25, point.z), 0.5, vec3(5.0,1.02,4.5)), dot(vec3(point.x, point.y+sin(point.z - iGlobalTime * 6.0) * cos(point.x - iGlobalTime) * .25, point.z), normal) - d);
-        return max(-distBox2(point, 0.5, vec3(5.0,1.02,4.5)),dot(point, normal) - d);
-
+float plane(vec3 point, vec3 normal, float d) 
+{
+    return max(-distBox2(point, 0.5, vec3(5.0,1.02,4.5)),dot(point, normal) - d);
 }
 
 float distPlane(vec3 p, vec4 n, vec3 pos)
 {
-  // n must be normalized
-  //return dot(p-pos,n.xyz) + n.w;
     return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(p-pos,n.xyz) + n.w));
-
 }
 
 float distScene(vec3 point)
@@ -296,20 +292,11 @@ void main()
 	vec3 dirLightPos = vec3(0.0,10.0,-10.0);
 	vec3 lightDirection = normalize(vec3(-1.0,1.0,-1.0));
 
-	//vec4 lightColor2 = vec4(1.0, 0.3, 0.3, 1.0);
-
-
 	Intersection intersect = rayMarch(camP, camDir);
 
 	if(intersect.exists)
 	{
-		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
-
-		//vec3 lightDir = normalize(dirLightPos - intersect.intersectP);
 		float shadow = max(0.7, softShadow(intersect.intersectP, lightDirection, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		//float shadowIntersect = shadow(intersect.intersectP-lightDirection*0.01, lightDirection);
-
-
 
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 
@@ -317,7 +304,6 @@ void main()
 		if(reflIntersect.exists)
 		{
 			intersect.color += vec4(1.0,0.3,0.3,1.0)*0.1;
-			//intersect.color = mix(intersect.color, vec4(1.0,0.3,0.3,1.0), 0.3);
 		}
 
 		float lightIntensity1 = max(0.4*(2.0-distance(intersect.intersectP, holePosAbove)),0.0);
@@ -325,21 +311,10 @@ void main()
 		intersect.color += (lightIntensity1*lightColor1)*lightIntensityAbove + (lightIntensity2*lightColor1)*soundIntensity;
 		intersect.color *= shadow;
 
-		//float shadow = max(0.2, softShadow(intersect.intersectP, lightDir, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
-		//intersect.color = intersect.color*vec4(0.5, 1.0, 1.0, 1.0)*shadowIntersect;
-
-		//Intersection reflIntersect = rayMarch(intersect.intersectP+intersect.normal*0.01, normalize(reflect(camDir, intersect.normal)));
-		//if(reflIntersect.exists)
-		//{
-	//		float shadowReflect = max(0.2, softShadow(reflIntersect.intersectP, lightDir, 0.1, length(dirLightPos - reflIntersect.intersectP), shadowK));
-//			reflIntersect.color = reflIntersect.color*shadowReflect;
-		//}
-
-		//Soft Shadows
 		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,1.0,1.0,1.0), length(intersect.intersectP-camP)/100);
 	}		
 	else
-		//gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
+	{
 		gl_FragColor =  vec4(1.0,0.42,0.36,0.0);
-
+	}
 }		

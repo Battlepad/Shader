@@ -15,7 +15,7 @@ uniform float planetPosX;
 uniform float boxColorInterpolate;
 uniform float boxColorEndInterpolate;
 
-const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
+const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 128;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
@@ -106,7 +106,7 @@ float distSphere(vec3 p, float r)
 float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
 {
     return opS(distSphere(vec4(p.xyz,1.0)
-        *translationMatrix(sphPos), 0.5/(7.0/planetSize)),distSphere(vec4(p.xyz,1.0)
+        *translationMatrix(sphPos), 0.25/(7.0/planetSize)),distSphere(vec4(p.xyz,1.0)
         *translationMatrix(plPos), planetSize));
 }
 
@@ -187,7 +187,7 @@ float distScene(vec3 point)
             *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
             *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
             ); 
-    float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-1.0,0.0,planetPosZ+4.0/(12.0/planetPosX)), planetPos);
+    float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-0.98,0.0,planetPosZ+3.76/(12.0/planetPosX)), planetPos);
     globalColor = distanceForms < distancePlanet ? boxColor : planetColor;
     return min(distanceForms,distancePlanet);
 }

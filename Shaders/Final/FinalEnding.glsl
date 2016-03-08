@@ -14,7 +14,9 @@ uniform float boxPosZ;
 uniform float camPosX;
 uniform float camPosZ;
 
-const float epsilon = 0.0001; //TODO: smaller epsilon with bisection?
+uniform float boxColorInterpolate;
+
+const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
 const int maxIterations = 256;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
@@ -161,7 +163,7 @@ float distScene(vec3 point)
       float distanceBox = distSphere2(((vec4(point.x,point.y,point.z,1.0)
             *translationMatrix(planetPos) //translation of cube
             *rotationMatrix(vec3(0.0,1.0,0.0), PI)) //rotation around z-axis
-            *translationMatrix(vec3(planetSize+1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation, so cube rotates around edge 
             0.25, vec3(0.0,0.0,0.0));  
 
     //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
@@ -328,15 +330,15 @@ void main()
 
         if(distance(reflectionStarsIntersect.intersectP, intersect.intersectP) > 25 && distance(reflectionStarsIntersect.intersectP, intersect.intersectP) < 75)
         {
-            gl_FragColor = (intersect.color+reflectionStarsIntersect.color)*lighting*1.2;
+            gl_FragColor = mix((intersect.color+reflectionStarsIntersect.color)*lighting*1.2, vec4(0.0),boxColorInterpolate);
         }
         else
         {
-            gl_FragColor = intersect.color*lighting;
+            gl_FragColor = mix(intersect.color*lighting, vec4(0.0), boxColorInterpolate);
         }
         if(reflectionSpheresIntersect.exists)
         {
-            gl_FragColor = gl_FragColor+reflectionSpheresIntersect.color*0.7;
+            gl_FragColor = mix(gl_FragColor+reflectionSpheresIntersect.color*0.7, vec4(0.0), boxColorInterpolate);
         }
 
 //        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);
@@ -373,7 +375,7 @@ void main()
             
             angle = fract(angle);
         }    
-    gl_FragColor = vec4(color,color,color,1.0);
+        gl_FragColor = mix(vec4(color,color,color,1.0), vec4(0.0), boxColorInterpolate);
     //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 
     }
