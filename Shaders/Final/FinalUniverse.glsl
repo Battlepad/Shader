@@ -1,4 +1,3 @@
-uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 
@@ -15,15 +14,13 @@ uniform float planetPosX;
 uniform float boxColorInterpolate;
 uniform float boxColorEndInterpolate;
 
-const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
+const float epsilon = 0.001;
 const int maxIterations = 128;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
 vec4 planetColor = vec4(1.0,0.42,0.36,0.0);
-
-//const vec3 boxPos = vec3(0.0,0.0,10.0);
 
 struct Intersection
 {
@@ -54,30 +51,45 @@ mat4 translationMatrix(vec3 delta)
                     0.0,    0.0,    0.0,    1.0     );
 }
 
+mat4 lookAt(vec3 eye, vec3 center, vec3 up)
+{
+    vec3 zaxis = normalize(center - eye);
+    vec3 xaxis = normalize(cross(up, zaxis));
+    vec3 yaxis = cross(zaxis, xaxis);
+
+    mat4 matrix;
+    //Column Major
+    matrix[0][0] = xaxis.x;
+    matrix[1][0] = yaxis.x;
+    matrix[2][0] = zaxis.x;
+    matrix[3][0] = 0;
+
+    matrix[0][1] = xaxis.y;
+    matrix[1][1] = yaxis.y;
+    matrix[2][1] = zaxis.y;
+    matrix[3][1] = 0;
+
+    matrix[0][2] = xaxis.z;
+    matrix[1][2] = yaxis.z;
+    matrix[2][2] = zaxis.z;
+    matrix[3][2] = 0;
+
+    matrix[0][3] = -dot(xaxis, eye);
+    matrix[1][3] = -dot(yaxis, eye);
+    matrix[2][3] = -dot(zaxis, eye);
+    matrix[3][3] = 1;
+
+    return matrix;
+}
+
 float opS( float d1, float d2 )
 {
     return max(-d1,d2);
 }
 
-float distBox2(vec3 p, vec3 b, vec3 m)
-{
-    vec3 d = abs(p-m) - b;
-    return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
-}
-
-/*float distBox(vec3 p, vec3 b)
-{
-  vec3 d = abs(p) - b;
-  return min(max(d.x,max(d.y,d.z)),0.0) +
-         length(max(d,0.0));
-}*/
-
 float distBox(vec3 p, vec3 data )
 {
     return max(max(abs(p.x)-data.x,abs(p.y)-data.y),abs(p.z)-data.z);
-    //float sphere = length(p)-0.5;
-    //return(mix(box, sphere, abs(sin(iGlobalTime))));
 }
 
 float distTriPrism( vec3 p, vec2 h )
@@ -88,14 +100,14 @@ float distTriPrism( vec3 p, vec2 h )
 
 float distCylinder( vec3 p, vec2 h )
 {
-  vec2 d = abs(vec2(length(p.xz),p.y)) - h;
-  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+    vec2 d = abs(vec2(length(p.xz),p.y)) - h;
+    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
 float distTorus( vec3 p, vec2 t )
 {
-  vec2 q = vec2(length(p.xz)-t.x,p.y);
-  return length(q)-t.y;
+    vec2 q = vec2(length(p.xz)-t.x,p.y);
+    return length(q)-t.y;
 }
 
 float distSphere(vec3 p, float r)
@@ -117,75 +129,41 @@ float distForms(vec3 p)
     float cylinder = distCylinder(p, vec2(0.5));
     float torus = distTorus(p, vec2(0.5));
     float sphere = distSphere(p, 0.5);
-
     return mix(mix(mix(mix(box, triPrism, toPrism), cylinder, toCylinder), torus, toTorus), sphere, toSphere);
 
 }
 
-vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+vec3 repeat(vec3 P, vec3 b)
 {
     return mod(P,b)-b/2;
 }
 
-vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+vec3 repeat2(vec3 P, vec3 b)
 {
     return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
 }
 
-/*float distScene(vec3 point){
-    vec3 spherePos = vec3(0.0,0.0,0.0);
-    float radius = 0.400;
-    vec3 b = vec3(8.0,8.0,8.0);
-    float dist = distSphere(repeat(point, b), spherePos, radius);
-    return dist;
-
-}*/
-
 float distSceneReflection(vec3 point)
 {
-    //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
-       // vec3(2.0),boxPos); //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
-    //globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-    //globalColor = boxColor;
-
-    //globalColor = planeColor;
-        vec3 b1 = vec3(5.0,3.0,5.0);
-        vec3 b2 = vec3(4.5,7.3,4.2);
-
-        //vec3 boxPos = vec3(0.0,0.0,10.0);
+    vec3 b1 = vec3(5.0,3.0,5.0);
+    vec3 b2 = vec3(4.5,7.3,4.2);
 
     float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-time))).xyz, b1),
         vec3(0.1,0.1,0.1));
     float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-time,time,0.0))).xyz, b2),
         vec3(0.1,0.1,0.1));
     return min(d1,d2);
-    //return distanceBox;
 }
-
-
-
 
 float distScene(vec3 point)
 {
-    //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
-        //vec3(2.0),boxPos);*/ //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
-    //globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-    //globalColor = boxColor;
-
-    //globalColor = planeColor;
     float planetPosZ = 20.0;
     vec3 planetPos = vec3(planetPosX,0.0,20.0);
 
-    /*float distanceBox = distBox(((vec4(point.xyz,1.0)
-            *translationMatrix(boxPos) //translation of cube
-            *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
-            *translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
-            vec3(0.5)); 
-    return distanceBox;*/
     float distanceForms = distForms(((vec4(point.xyz,1.0)
             *translationMatrix(boxPos) //translation of cube
-            *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation around z-axis
-            *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation, so cube rotates around edge 
+            *rotationMatrix(vec3(0.5,0.7,0.4), iGlobalTime)) //rotation
+            *translationMatrix(vec3(0.0,0.0,0.0))).xyz //translation
             ); 
     float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-0.98,0.0,planetPosZ+3.76/(12.0/planetPosX)), planetPos);
     globalColor = distanceForms < distancePlanet ? boxColor : planetColor;
@@ -280,58 +258,18 @@ Intersection rayMarchReflect(vec3 origin, vec3 direction)
     return intersect;
 }
 
-mat4 lookAt(vec3 eye, vec3 center, vec3 up)
-{
-    vec3 zaxis = normalize(center - eye);
-    vec3 xaxis = normalize(cross(up, zaxis));
-    vec3 yaxis = cross(zaxis, xaxis);
-
-    mat4 matrix;
-    //Column Major
-    matrix[0][0] = xaxis.x;
-    matrix[1][0] = yaxis.x;
-    matrix[2][0] = zaxis.x;
-    matrix[3][0] = 0;
-
-    matrix[0][1] = xaxis.y;
-    matrix[1][1] = yaxis.y;
-    matrix[2][1] = zaxis.y;
-    matrix[3][1] = 0;
-
-    matrix[0][2] = xaxis.z;
-    matrix[1][2] = yaxis.z;
-    matrix[2][2] = zaxis.z;
-    matrix[3][2] = 0;
-
-    matrix[0][3] = -dot(xaxis, eye);
-    matrix[1][3] = -dot(yaxis, eye);
-    matrix[2][3] = -dot(zaxis, eye);
-    matrix[3][3] = 1;
-
-    return matrix;
-}
-
 void main()
 {
-	vec2 uv =  gl_FragCoord.xy/iResolution.x;
-
-
     float fov = 90.0;
     float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-    vec3 camP = vec4(0, 0, 5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
-    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));//TODO: wieder zu -1.0 machen!
-    //camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+    vec3 camP = vec4(0, 0, 5.0,1.0);
+    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));
 
     vec3 areaLightPos = vec3(0.0,-10.0,10.0);
 
-    //vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-    //vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-
     Intersection intersect = rayMarch(camP, camDir);
-    //Intersection reflectionIntersect2 = rayMarchReflect2(camP, camDir);
-
 
     if(intersect.exists)
     {
@@ -351,19 +289,11 @@ void main()
         {
             gl_FragColor = gl_FragColor+reflectionSpheresIntersect.color*0.7;
         }
-
-//        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);
     }   
-    /*else if(reflectionIntersect2.exists)   
-    {
-        gl_FragColor = reflectionIntersect2.color;
-    } */
     else
     {
-        //gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
         vec2 position = ( gl_FragCoord.xy - iResolution.xy*.5 ) / iResolution.x;
 
-        // 256 angle steps
         float angle = atan(position.y,position.x)/(2.*3.14159265359);
         angle -= floor(angle);
         float rad = length(position);
@@ -385,8 +315,6 @@ void main()
             
             angle = fract(angle);
         }    
-    gl_FragColor = mix(vec4(color,color,color,1.0), vec4(0.0), boxColorInterpolate);
-    //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-
+        gl_FragColor = mix(vec4(color,color,color,1.0), vec4(0.0), boxColorInterpolate);
     }
 }

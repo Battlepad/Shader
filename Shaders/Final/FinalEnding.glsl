@@ -16,7 +16,7 @@ uniform float camPosZ;
 
 uniform float boxColorInterpolate;
 
-const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
+const float epsilon = 0.001;
 const int maxIterations = 256;
 const vec3 boxPos = vec3(0.0,0.0,5.5);
 
@@ -24,7 +24,6 @@ vec4 globalColor = vec4(0.0);
 vec4 sphereColor = vec4(0.15,0.87,0.77,1.0);
 vec4 planetColor = vec4(1.0,0.42,0.36,0.0);
 
-//const vec3 boxPos = vec3(0.0,0.0,10.0);
 
 struct Intersection
 {
@@ -84,35 +83,26 @@ float distPlanet(vec3 p, vec3 sphPos, vec3 plPos)
         *translationMatrix(plPos), planetSize));
 }
 
-vec3 repeat(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+vec3 repeat(vec3 P, vec3 b) 
 {
     return mod(P,b)-b/2;
 }
 
-vec3 repeat2(vec3 P, vec3 b) //P ist Punkt wo man mit Marching gerade ist
+vec3 repeat2(vec3 P, vec3 b)
 {
     return mod(P-vec3(3.0,7.0,0.0), b)-b/2;
 }
 
 float distSceneReflection(vec3 point)
 {
-    //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
-       // vec3(2.0),boxPos); //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
-    //globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-    //globalColor = boxColor;
-
-    //globalColor = planeColor;
-        vec3 b1 = vec3(5.0,3.0,5.0);
-        vec3 b2 = vec3(4.5,7.3,4.2);
-
-        //vec3 boxPos = vec3(0.0,0.0,10.0);
+    vec3 b1 = vec3(5.0,3.0,5.0);
+    vec3 b2 = vec3(4.5,7.3,4.2);
 
     float d1 = distBox(repeat((vec4(point.xyz,1.0)*translationMatrix(vec3(0.0,0.0,0.0-time))).xyz, b1),
         vec3(0.1,0.1,0.1));
     float d2 = distBox(repeat2((vec4(point.xyz,1.0)*translationMatrix(vec3(-time,time,0.0))).xyz, b2),
         vec3(0.1,0.1,0.1));
     return min(d1,d2);
-    //return distanceBox;
 }
 
 
@@ -120,12 +110,6 @@ float distSceneReflection(vec3 point)
 
 float distScene(vec3 point)
 {
-    //float distanceBox = distBox2(vec4(point.x,point.y,point.z,1.0),
-        //vec3(2.0),boxPos);*/ //      vec3(0.5),vec3(4.5,boxPosY,4.5)); 
-    //globalColor = distanceBox < distancePlane ? boxColor : planeColor;
-    //globalColor = boxColor;
-
-    //globalColor = planeColor;
     float distanceSphere;
     float planetPosZ = 20.0;
     vec3 planetPos = vec3(planetPosX,0.0,planetPosZ);
@@ -137,44 +121,29 @@ float distScene(vec3 point)
     else if(iGlobalTime < 122.0971)
     {
         distanceSphere = distSphere2(((vec4(point.x,point.y,point.z,1.0)
-            *translationMatrix(planetPos) //translation of cube
-            *rotationMatrix(vec3(0.0,1.0,0.0), sphereMoveTime/2-108.42/2-PI)) //iGlobalTime/2-108.42/2 is one at starting point of the else, 
-                                                                            //-PI, so it starts at the right side//rotation around z-axis
-            *translationMatrix(vec3(-planetSize-1.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
+            *translationMatrix(planetPos) //translation of sphere
+            *rotationMatrix(vec3(0.0,1.0,0.0), sphereMoveTime/2-108.42/2-PI))   //iGlobalTime/2-108.42/2 is one at starting point of the else, 
+                                                                                //-PI, so it starts at the right side
+            *translationMatrix(vec3(-planetSize-1.0,0.0,0.0))).xyz, //translation 
             0.25, vec3(0.0,0.0,0.0));  
     }
     else
     {
         distanceSphere = distSphere2(((vec4(point.x,point.y,point.z,1.0)
-            *translationMatrix(planetPos) //translation of cube
-            *rotationMatrix(vec3(0.0,1.0,0.0), 118.9395/2-108.42/2-PI)) //iGlobalTime/2-108.42/2 is one at starting point of the else, 
-                                                                            //-PI, so it starts at the right side//rotation around z-axis
-            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation, so cube rotates around edge 
+            *translationMatrix(planetPos) //translation of sphere
+            *rotationMatrix(vec3(0.0,1.0,0.0), 118.9395/2-108.42/2-PI)) 
+            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation
             0.25, vec3(0.0,0.0,0.0));  
     }
-
-
-
-    /*float distanceBox = distSphere(((vec4(point.x,point.y,point.z,1.0)
-            *translationMatrix(vec3(0.0)) //translation of cube
-            *rotationMatrix(vec3(0.0,1.0,0.0), time)) //rotation around z-axis
-            *translationMatrix(vec3(planetPosX,0.0,45.0))).xyz, //translation, so cube rotates around edge 
-            0.25);  */
-      float distanceBox = distSphere2(((vec4(point.x,point.y,point.z,1.0)
-            *translationMatrix(planetPos) //translation of cube
-            *rotationMatrix(vec3(0.0,1.0,0.0), PI)) //rotation around z-axis
-            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation, so cube rotates around edge 
+    float distanceBox = distSphere2(((vec4(point.x,point.y,point.z,1.0)
+            *translationMatrix(planetPos) //translation of sphere
+            *rotationMatrix(vec3(0.0,1.0,0.0), PI)) //rotation
+            *translationMatrix(vec3(boxPosX,0.0,boxPosZ))).xyz, //translation
             0.25, vec3(0.0,0.0,0.0));  
-
-    //float distancePlanet = distSphere(vec4(point.xyz,1.0)*translationMatrix(vec3(15.0,0.0,45.0)), vec3(0.0), 10);
-
     float distancePlanet = distPlanet(point, vec3(planetPosX+planetSize-0.98,0.0,planetPosZ+3.76/(12.0/planetPosX)), planetPos);
-    //(vec4(point.xyz,1.0)*translationMatrix(0.0,0.0,5.0)).xyz
-             //translation of cube
+
     globalColor = distanceSphere < distancePlanet ? sphereColor : planetColor;
     return min(distanceSphere,distancePlanet);
-    //return distanceBox;
-
 }
 
 vec3 getNormal(vec3 point)
@@ -305,22 +274,12 @@ void main()
     float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
     vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-    vec3 camP = vec4(camPosX,0.0,camPosZ,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
-        //vec3 camP = vec4(0.0,0.0,5.0,1.0);//*rotationMatrix(vec3(0.0,1.0,0.0), 1)*translationMatrix(vec3(-boxPos));
-
-    //vec3 camP = vec4(5.0, 10.0, 0.0, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 4.0);
-    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));//TODO: wieder zu -1.0 machen!
-    //camDir = (lookAt(camP, vec3(boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
-    //camDir = (lookAt(camP, vec3(-boxPos), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
+    vec3 camP = vec4(camPosX,0.0,camPosZ,1.0);
+    vec3 camDir = normalize(vec3(p.x, p.y, -1.0));
 
     vec3 areaLightPos = vec3(0.0,-10.0,10.0);
 
-    //vec3 dirLightPos = opTx(vec3(4.0,2.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-    //vec3 lightDirection = opTx(vec3(-1.0,-1.0,0.0),rotationMatrix(vec3(0.0,1.0,0.0), iGlobalTime));
-
     Intersection intersect = rayMarch(camP, camDir);
-    //Intersection reflectionIntersect2 = rayMarchReflect2(camP, camDir);
-
 
     if(intersect.exists)
     {
@@ -341,18 +300,11 @@ void main()
             gl_FragColor = mix(gl_FragColor+reflectionSpheresIntersect.color*0.7, vec4(0.0), boxColorInterpolate);
         }
 
-//        gl_FragColor = mix(intersect.color, vec4(0.8,0.5,1.0,1.0), length(intersect.intersectP-camP)/50);
     }   
-    /*else if(reflectionIntersect2.exists)   
-    {
-        gl_FragColor = reflectionIntersect2.color;
-    } */
     else
     {
-        //gl_FragColor = mix(vec4(0.0,0.0,0.0,0.0),fogColor, min(length(intersect.intersectP-camP)/fog,1.0));
         vec2 position = ( gl_FragCoord.xy - iResolution.xy*.5 ) / iResolution.x;
 
-        // 256 angle steps
         float angle = atan(position.y,position.x)/(2.*3.14159265359);
         angle -= floor(angle);
         float rad = length(position);
@@ -364,7 +316,6 @@ void main()
             float angleRnd = floor(angle*360.)+1.;
             float angleRnd1 = fract(angleRnd*fract(angleRnd*.7235)*45.1);
             float angleRnd2 = fract(angleRnd*fract(angleRnd*.82657)*13.724);
-            //float t = time*5.0+angleRnd1*100.;
             float t = time*5.0+angleRnd1*100.;
             float radDist = sqrt(angleRnd2+float(i));
             
@@ -376,7 +327,5 @@ void main()
             angle = fract(angle);
         }    
         gl_FragColor = mix(vec4(color,color,color,1.0), vec4(0.0), boxColorInterpolate);
-    //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-
     }
 }

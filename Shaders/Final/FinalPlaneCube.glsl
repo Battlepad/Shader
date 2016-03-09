@@ -1,7 +1,6 @@
 #define PI 3.1459
 #define RAD PI / 180.0
 
-uniform vec3 iMouse;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform sampler2D tex;
@@ -31,9 +30,8 @@ vec4 boxColor = vec4(0.15,0.87,0.77,1.0);
 vec4 planeColor = vec4(0.31,0.439,0.812,1.0);
 float shadowK = 18.0;
 
-const float epsilon = 0.001; //TODO: smaller epsilon with bisection?
+const float epsilon = 0.001; 
 const int maxIterations = 256;
-const float marchEpsilon = 0.001;
 
 struct Intersection
 {
@@ -95,37 +93,16 @@ mat4 lookAt(vec3 eye, vec3 center, vec3 up)
     return matrix;
 }
 
-vec3 translate(vec4 point, mat4 translMatrix)
-{
-	return (translMatrix*point).xyz;
-}
-
-vec3 opTx( vec3 p, mat4 m )
-{
-    vec3 q = inverse(m)*vec4(p,1.0);
-    return q;
-}
-
-float distBox(vec3 p, vec3 b)
-{
-	return max(max(abs(p.x)-b.x,abs(p.y)-b.y),abs(p.z)-b.z);
-}
-
-float distBox2(vec3 p, vec3 b, vec3 m)
+float distBox(vec3 p, vec3 b, vec3 m)
 {
   vec3 d = abs(p-m) - b;
   return min(max(d.x,max(d.y,d.z)),0.0) +
          length(max(d,0.0));
 }
 
-float plane(vec3 point, vec3 normal, float d) 
+float distPlane(vec3 point, vec3 normal, float d) 
 {
-    return max(-distBox2(point, 0.5, vec3(5.0,1.02,4.5)),dot(point, normal) - d);
-}
-
-float distPlane(vec3 p, vec4 n, vec3 pos)
-{
-    return max(-distBox2(p, 0.5, vec3(5.0,1.02,4.5)),(dot(p-pos,n.xyz) + n.w));
+    return max(-distBox(point, 0.5, vec3(5.0,1.02,4.5)),dot(point, normal) - d);
 }
 
 float distScene(vec3 point)
@@ -134,7 +111,7 @@ float distScene(vec3 point)
 	vec4 boxColorMixed = mix(boxColor, planeColor, boxColorInterpolate);
 	if(iGlobalTime<33.5)
 	{
-		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
+		distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
 			*translationMatrix(boxPos) //translation of cube
 			*rotationMatrix(vec3(-1.0,0.0,0.0), time/0.5*(PI/2))) //rotation around z-axis
 			*translationMatrix(vec3(0.0,tiltY,tiltZ))).xyz, //translation, so cube rotates around edge 
@@ -142,14 +119,14 @@ float distScene(vec3 point)
 	}
 	else
 	{
-		distanceBox = distBox2(((vec4(point.x,point.y,point.z,1.0)
+		distanceBox = distBox(((vec4(point.x,point.y,point.z,1.0)
 			*translationMatrix(vec3(-5.0,boxPosY,-4.5)) //translation of cube
 			*rotationMatrix(vec3(tiltX,tiltY,tiltZ), time)) //rotation around z-axis
 			*translationMatrix(vec3(0.0,0.0,0.0))).xyz, //translation, so cube rotates around edge 
 			vec3(0.5), vec3(0.0,0.0,0.0)); 
 	}
 
-	float distancePlane = plane(point, vec3(0.0,1.0,0.0), 1.5);
+	float distancePlane = distPlane(point, vec3(0.0,1.0,0.0), 1.5);
 	globalColor = distanceBox < distancePlane ? boxColorMixed : planeColor;
 	return distanceBox < distancePlane ? distanceBox : distancePlane;
 }
@@ -157,7 +134,21 @@ float distScene(vec3 point)
 float distSceneReflect(vec3 point)
 {
 	globalColor = planeColor;
-	return plane(point, vec3(0.0,1.0,0.0), 1.5);
+	return distPlane(point, vec3(0.0,1.0,0.0), 1.5);
+}
+
+float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
+{
+    float res = 1.0;
+    for( float t=mint; t < maxt; )
+    {
+        float h = distScene(ro + rd*t);
+        if( h<0.001 )
+            return 0.0;
+        res = min( res, k*h/t );
+        t += h;
+    }
+    return res;
 }
 
 vec3 getNormal(vec3 point)
@@ -178,20 +169,6 @@ vec3 getNormal(vec3 point)
 	return normalize(gradient);
 }
 
-float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
-{
-    float res = 1.0;
-    for( float t=mint; t < maxt; )
-    {
-        float h = distScene(ro + rd*t);
-        if( h<0.001 )
-            return 0.0;
-        res = min( res, k*h/t );
-        t += h;
-    }
-    return res;
-}
-
 Intersection rayMarch(vec3 origin, vec3 direction)
 {
 	Intersection intersect;
@@ -200,7 +177,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	vec3 newPos = origin;
 	newPos += 1.0*direction;
 
-	float height = 0; //TODO; 0 = guter Init wert?
+	float height = 0;
 	float t = 1000;
 
 	for(int i = 0; i <= maxIterations; i++)
@@ -236,7 +213,7 @@ Intersection rayMarchReflect(vec3 origin, vec3 direction)
 	vec3 newPos = origin;
 	newPos += 1.0*direction;
 
-	float height = 0; //TODO; 0 = guter Init wert?
+	float height = 0;
 	float t = 1000;
 
 	for(int i = 0; i <= maxIterations; i++)
@@ -262,12 +239,6 @@ Intersection rayMarchReflect(vec3 origin, vec3 direction)
 	intersect.intersectP = newPos;
 	intersect.color = vec4(0.0,0.0,0.0,0.0);
 	return intersect;
-}
-
-float shadow(vec3 pos, vec3 lightDir)
-{
-	Intersection shadowIntersect = rayMarch(pos, -lightDir);
-	return shadowIntersect.exists ? 0.2 : 1.0;
 }
 
 void main()

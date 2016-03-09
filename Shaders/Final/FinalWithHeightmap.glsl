@@ -30,9 +30,6 @@ uniform float boxHeight;
 
 uniform float fogDistance;
 
-varying vec2 uv;
-
-float time=iGlobalTime;
 int textureSize = 100;
 vec4 globalColor = vec4(0.0);
 vec4 boxColor = vec4(0.31,0.439,0.812,1.0);
@@ -102,45 +99,10 @@ mat4 lookAt(vec3 eye, vec3 center, vec3 up)
     return matrix;
 }
 
-vec3 opTx( vec3 p, mat4 m )
-{
-    vec3 q = inverse(m)*vec4(p,1.0);
-    return q;
-}
-
 float f(float x, float y)
 {
-	return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*heightmapHeight/cubeHeightDiv;//cubeHeightDiv; //0.95 ist Wert, wie oft Würfel wiederholt werden
-	//return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*/1;//cubeHeightDiv; //1.5 ist Wert, wie oft Würfel wiederholt werden
-
-	//return texture(tex, trunc(vec2(x,y)*1.0)/(textureSize)).x*4.0/cubeHeightDiv+cubeHeight; //0.95 (lassen) ist Wert, wie oft Würfel wiederholt werden
-	//je höher, desto dichter (kleiner) sind cubes, je kleiner, desto größer sind cubes
+	return texture(tex, trunc(vec2(x,y)*0.95)/(textureSize)).x*heightmapHeight/cubeHeightDiv;//0.95 ist the value, how often the pattern gets repeated
 }
-
-/*vec3 BiSection(vec3 origin, vec3 dir, float t)
-{
-
-	float minT = t - epsilon;
-	float maxT = t;
-
-	vec3 p = origin + minT * dir;
-
-	for(float i = 1.0; i <15.0; ++i)
-	{
-		t = (minT + maxT) * 0.5;
-		p = origin + t * dir;
-		float height = f(p.x, p.z);
-		if(height > p.y)
-		{
-			maxT = t;
-		}
-		else if(height < p.y)
-		{
-			minT = t;
-		} 
-	}
-	return p;
-}*/
 
 vec3 bisect(vec3 _pos, vec3 _direction, int counter)
 {
@@ -174,7 +136,6 @@ float distScene(vec3 point)
 		vec3(0.5),vec3(15.3,boxPosY,14.15)); 
 
 	globalColor = distanceBox < distanceHill ? mix(boxColor, boxColorEnd, boxColorEndInterpolate) : boxColor;
-
 	return min(distanceHill, distanceBox);
 }
 
@@ -204,20 +165,6 @@ vec3 getNormalHf(vec3 p)
     return normalize( n );
 }
 
-float softShadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
-{
-    float res = 1.0;
-    for( float t=mint; t < maxt; )
-    {
-        float h = distScene(ro + rd*t);
-        if( h<0.001 )
-            return 0.0;
-        res = min( res, k*h/t );
-        t += h;
-    }
-    return res;
-}
-
 Intersection rayMarch(vec3 origin, vec3 direction)
 {
 	Intersection intersect;
@@ -226,7 +173,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	vec3 newPos = origin;
 	newPos += 1.0*direction;
 
-	float height = 0; //TODO; 0 = guter Init wert?
+	float height = 0;
 	float t = 1000;
 
 	if(iGlobalTime < 65.18)
@@ -250,7 +197,7 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 			}
 			else if(newPos.y <= height)
 			{
-				newPos = bisect(newPos, direction, 0.0); //TODO: raushauen?
+				newPos = bisect(newPos, direction, 0.0);
 
 				intersect.exists = true;
 				intersect.normal = getNormalHf(newPos);
@@ -296,20 +243,14 @@ Intersection rayMarch(vec3 origin, vec3 direction)
 	return intersect;
 }
 
-float shadow(vec3 pos, vec3 lightDir)
-{
-	Intersection shadowIntersect = rayMarch(pos, -lightDir);
-	return shadowIntersect.exists ? 0.2 : 1.0;
-}
-
 void main()
 {
 	float fov = 90.0;
 	float tanFov = tan(fov / 2.0 * 3.14159 / 180.0) / iResolution.x;
 	vec2 p = tanFov * (gl_FragCoord.xy * 2.0 - iResolution.xy);
 
-	vec3 camP = vec4(camPosX, camPosY, camPosZ, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 1.3)*translationMatrix(vec3(16.0,0.0,15.0)); //opTx(point,rotationMatrix(vec3(-1.0,0.0,0.0), iGlobalTime)), vec3(0.0,1.0,1.0)
-	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));//TODO: wieder zu -1.0 machen!
+	vec3 camP = vec4(camPosX, camPosY, camPosZ, 1.0)*rotationMatrix(vec3(0.0,1.0,0.0), 1.3)*translationMatrix(vec3(16.0,0.0,15.0));
+	vec3 camDir = normalize(vec3(p.x, p.y, 1.0));
 	camDir = (lookAt(camP, vec3(15.0, lookAtY,15.0), vec3(0.0,1.0,0.0))*vec4(camDir.xyz, 1.0)).xyz;
 
 	vec3 areaLightPos = vec3(0.0,15.0,-10.0);
@@ -322,7 +263,8 @@ void main()
 		gl_FragColor = mix(intersect.color+0.2, vec4(1.0,0.42,0.36,0.0), length(intersect.intersectP-camP)/fogDistance);
 	}		
 	else
-		//gl_FragColor =  mix(mix(vec4(1.0,0.42,0.36,0.0), vec4(1.0,1.0,1.0,1.0), length(intersect.intersectP-camP)/), vec4(0.0), boxColorInterpolate);
-				gl_FragColor =  mix(vec4(1.0,0.42,0.36,0.0), vec4(0.0), boxColorInterpolate);
+	{
+		gl_FragColor =  mix(vec4(1.0,0.42,0.36,0.0), vec4(0.0), boxColorInterpolate);
+	}
 
 }		
