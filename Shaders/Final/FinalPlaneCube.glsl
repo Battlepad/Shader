@@ -267,7 +267,7 @@ void main()
 
 	if(intersect.exists)
 	{
-		float shadow = max(0.7, softShadow(intersect.intersectP, lightDirection, 0.1, length(dirLightPos - intersect.intersectP), shadowK));
+		float shadow = max(0.7, softShadow(intersect.intersectP, lightDirection, 0.01, length(dirLightPos - intersect.intersectP), shadowK));
 
 		intersect.color = intersect.color*max(0.2, dot(intersect.normal, normalize(areaLightPos-intersect.intersectP)));
 
